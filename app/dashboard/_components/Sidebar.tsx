@@ -16,7 +16,7 @@ export default function Sidebar() {
   return (
     <aside className="w-60 shrink-0 flex flex-col bg-white text-neutral-100 min-h-screen">
       <div className="px-6 py-5">
-        <a href='/' className="text-3xl font-bold tracking-tight text-violet-800">finia</a>
+        <a href='/' className="text-3xl font-bold tracking-tight text-violet-700">finia</a>
       </div>
 
       <nav className="flex-1 px-3 py-4 space-y-2">

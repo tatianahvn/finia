@@ -1,72 +1,158 @@
 @import "tailwindcss";
 
+/* ─── Semantic tokens — light ─────────────────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg-base:        #FFFFFF;
+  --bg-surface:     #FAFAFA;
+  --bg-elevated:    #FFFFFF;
+  --bg-subtle:      #FDF4FF;
+  --bg-accent:      #7C3AED;
+
+  --border-default: #F0E8FF;
+  --border-strong:  #D8B4FE;
+
+  --text-primary:   #18181B;
+  --text-secondary: #52525B;
+  --text-muted:     #A1A1AA;
+  --text-on-accent: #FFFFFF;
+  --text-brand:     #7C3AED;
+
+  --btn-bg:         #7C3AED;
+  --btn-hover:      #6D28D9;
+  --btn-text:       #FFFFFF;
+
+  --positive:       #059669;
+  --positive-bg:    #ECFDF5;
+  --negative:       #DC2626;
+  --negative-bg:    #FEF2F2;
+  --warning:        #D97706;
+  --warning-bg:     #FFFBEB;
 }
 
+/* ─── Semantic tokens — dark ──────────────────────────────── */
+.dark {
+  --bg-base:        #0F0B1A;
+  --bg-surface:     #170F28;
+  --bg-elevated:    #1E1535;
+  --bg-subtle:      #231A3D;
+  --bg-accent:      #9333EA;
+
+  --border-default: #2D2249;
+  --border-strong:  #4C3575;
+
+  --text-primary:   #F4F0FF;
+  --text-secondary: #C4B5FD;
+  --text-muted:     #7C6FAA;
+  --text-on-accent: #FFFFFF;
+  --text-brand:     #C084FC;
+
+  --btn-bg:         #9333EA;
+  --btn-hover:      #A855F7;
+  --btn-text:       #FFFFFF;
+
+  --positive:       #34D399;
+  --positive-bg:    rgba(52, 211, 153, 0.10);
+  --negative:       #F87171;
+  --negative-bg:    rgba(248, 113, 113, 0.10);
+  --warning:        #FCD34D;
+  --warning-bg:     rgba(252, 211, 77, 0.10);
+}
+
+/* ─── Tailwind v4 design tokens ───────────────────────────── */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 
-  /* Violet */
-  --color-violet-50: #F0EEFF;
-  --color-violet-100: #DDD8FA;
-  --color-violet-200: #BEB5F5;
-  --color-violet-400: #7B6EE8;
-  --color-violet-600: #4B3FC0;
-  --color-violet-800: #2E1F7A;
-  --color-violet-900: #1A1148;
+  /* Semantic utilities that follow the active theme */
+  --color-base:      var(--bg-base);
+  --color-surface:   var(--bg-surface);
+  --color-elevated:  var(--bg-elevated);
+  --color-subtle:    var(--bg-subtle);
+  --color-accent:    var(--bg-accent);
 
-  /* Neutral */
-  --color-neutral-50: #FAFAF8;
-  --color-neutral-100: #F3F2EE;
-  --color-neutral-200: #E5E3DC;
-  --color-neutral-400: #8C8B85;
-  --color-neutral-900: #3B3B38;
+  /* Violet — Violeta Cálido */
+  --color-violet-50:  #FDF4FF;
+  --color-violet-100: #F3E8FF;
+  --color-violet-200: #E9D5FF;
+  --color-violet-300: #D8B4FE;
+  --color-violet-400: #C084FC;
+  --color-violet-500: #A855F7;
+  --color-violet-600: #9333EA;
+  --color-violet-700: #7C3AED;
+  --color-violet-800: #6D28D9;
+  --color-violet-900: #4C1D95;
 
-  /* Lavanda */
-  --color-lavanda-light: #EBE9FB;
-  --color-lavanda: #4B3FA0;
-  --color-lavanda-dark: #2A2450;
+  /* Neutral — tinte violeta frío */
+  --color-neutral-50:  #FAFAFA;
+  --color-neutral-100: #F4F0FF;
+  --color-neutral-200: #EDE8FF;
+  --color-neutral-400: #A1A1AA;
+  --color-neutral-900: #18181B;
 
-  /* Durazno */
-  --color-durazno-light: #FAE9E2;
-  --color-durazno: #8B3A20;
-  --color-durazno-dark: #3D1E12;
+  /* Neutral dark surfaces */
+  --color-neutral-dark-50:  #0F0B1A;
+  --color-neutral-dark-100: #170F28;
+  --color-neutral-dark-200: #1E1535;
+  --color-neutral-dark-300: #231A3D;
+  --color-neutral-dark-400: #2D2249;
+  --color-neutral-dark-500: #4C3575;
+  --color-neutral-dark-900: #F4F0FF;
 
-  /* Menta */
-  --color-menta-light: #E3F5EC;
-  --color-menta: #1A5E3A;
-  --color-menta-dark: #102A1D;
+  /* Lavanda — surface/muted brand */
+  --color-lavanda-light: #F3E8FF;
+  --color-lavanda:       #7C3AED;
+  --color-lavanda-dark:  #231A3D;
 
-  /* Rosa */
-  --color-rosa-light: #FAECF2;
-  --color-rosa: #8B2B55;
-  --color-rosa-dark: #391222;
+  /* Durazno — alertas / gastos */
+  --color-durazno-light: #FFF1EC;
+  --color-durazno:       #E05A2B;
+  --color-durazno-dark:  #FF7A4D;
 
-  /* Celeste */
-  --color-celeste-light: #E4F0FB;
-  --color-celeste: #1A4A7A;
-  --color-celeste-dark: #0F2540;
+  /* Menta — positivo / ingresos */
+  --color-menta-light: #ECFDF5;
+  --color-menta:       #059669;
+  --color-menta-dark:  #34D399;
 
-  /* Ambar */
-  --color-ambar-light: #FDF0DC;
-  --color-ambar: #7A4A10;
-  --color-ambar-dark: #3A250A;
-}
+  /* Rosa — moda */
+  --color-rosa-light: #FDF2F8;
+  --color-rosa:       #BE185D;
+  --color-rosa-dark:  #F472B6;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* Celeste — hogar / info */
+  --color-celeste-light: #EFF6FF;
+  --color-celeste:       #2563EB;
+  --color-celeste-dark:  #60A5FA;
+
+  /* Ambar — ocio / warning */
+  --color-ambar-light: #FFFBEB;
+  --color-ambar:       #D97706;
+  --color-ambar-dark:  #FCD34D;
+
+  /* Cat — colores para gráficas por categoría */
+  --color-cat-food-light:       #E05A2B;
+  --color-cat-food-dark:        #FF7A4D;
+  --color-cat-home-light:       #2563EB;
+  --color-cat-home-dark:        #60A5FA;
+  --color-cat-transport-light:  #0D9488;
+  --color-cat-transport-dark:   #2DD4BF;
+  --color-cat-health-light:     #DC2626;
+  --color-cat-health-dark:      #F87171;
+  --color-cat-leisure-light:    #D97706;
+  --color-cat-leisure-dark:     #FCD34D;
+  --color-cat-education-light:  #7C3AED;
+  --color-cat-education-dark:   #A78BFA;
+  --color-cat-savings-light:    #059669;
+  --color-cat-savings-dark:     #34D399;
+  --color-cat-fashion-light:    #BE185D;
+  --color-cat-fashion-dark:     #F472B6;
+  --color-cat-tech-light:       #4F46E5;
+  --color-cat-tech-dark:        #818CF8;
+  --color-cat-other-light:      #78716C;
+  --color-cat-other-dark:       #A8A29E;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-sans, Arial, Helvetica, sans-serif);
 }

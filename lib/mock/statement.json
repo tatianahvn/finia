@@ -1,0 +1,323 @@
+{
+  "resumen": {
+    "banco": "BBVA México",
+    "titular": "TATIANA HERNÁNDEZ",
+    "numero_cuenta": "****4521",
+    "periodo_inicio": "2026-03-01",
+    "periodo_fin": "2026-03-31",
+    "saldo_inicial": 12450.00,
+    "saldo_final": 8320.75,
+    "total_cargos": 18429.25,
+    "total_abonos": 14300.00,
+    "moneda": "MXN"
+  },
+  "transacciones": [
+    {
+      "fecha": "2026-03-01",
+      "descripcion": "DEPÓSITO NÓMINA EMPRESA SA",
+      "comercio": null,
+      "monto": 14300.00,
+      "tipo": "nomina_ingreso",
+      "categoria": "nomina",
+      "confianza": 0.98
+    },
+    {
+      "fecha": "2026-03-02",
+      "descripcion": "PAGO OXXO CONVENIENCE STORE",
+      "comercio": "OXXO",
+      "monto": 185.50,
+      "tipo": "cargo",
+      "categoria": "alimentacion",
+      "confianza": 0.95
+    },
+    {
+      "fecha": "2026-03-03",
+      "descripcion": "UBER TRIP CDMX",
+      "comercio": "Uber",
+      "monto": 94.00,
+      "tipo": "cargo",
+      "categoria": "transporte",
+      "confianza": 0.97
+    },
+    {
+      "fecha": "2026-03-03",
+      "descripcion": "SPOTIFY PREMIUM MX",
+      "comercio": "Spotify",
+      "monto": 99.00,
+      "tipo": "cargo",
+      "categoria": "entretenimiento",
+      "confianza": 0.99
+    },
+    {
+      "fecha": "2026-03-04",
+      "descripcion": "FARMACIA DEL AHORRO",
+      "comercio": "Farmacia del Ahorro",
+      "monto": 320.00,
+      "tipo": "cargo",
+      "categoria": "salud",
+      "confianza": 0.93
+    },
+    {
+      "fecha": "2026-03-04",
+      "descripcion": "WALMART SUPERCENTER",
+      "comercio": "Walmart",
+      "monto": 1240.80,
+      "tipo": "cargo",
+      "categoria": "alimentacion",
+      "confianza": 0.96
+    },
+    {
+      "fecha": "2026-03-05",
+      "descripcion": "NETFLIX MEXICO",
+      "comercio": "Netflix",
+      "monto": 219.00,
+      "tipo": "cargo",
+      "categoria": "entretenimiento",
+      "confianza": 0.99
+    },
+    {
+      "fecha": "2026-03-05",
+      "descripcion": "PEMEX GASOLINERA AV REFORMA",
+      "comercio": "PEMEX",
+      "monto": 600.00,
+      "tipo": "cargo",
+      "categoria": "transporte",
+      "confianza": 0.94
+    },
+    {
+      "fecha": "2026-03-06",
+      "descripcion": "CFE PAGO RECIBO LUZ",
+      "comercio": "CFE",
+      "monto": 480.00,
+      "tipo": "cargo",
+      "categoria": "servicios",
+      "confianza": 0.98
+    },
+    {
+      "fecha": "2026-03-07",
+      "descripcion": "CINEPOLIS PELICULA",
+      "comercio": "Cinépolis",
+      "monto": 230.00,
+      "tipo": "cargo",
+      "categoria": "entretenimiento",
+      "confianza": 0.97
+    },
+    {
+      "fecha": "2026-03-08",
+      "descripcion": "SORIANA MERCADO CONDESA",
+      "comercio": "Soriana",
+      "monto": 875.30,
+      "tipo": "cargo",
+      "categoria": "alimentacion",
+      "confianza": 0.95
+    },
+    {
+      "fecha": "2026-03-09",
+      "descripcion": "DIDI RIDE POLANCO",
+      "comercio": "DiDi",
+      "monto": 72.00,
+      "tipo": "cargo",
+      "categoria": "transporte",
+      "confianza": 0.96
+    },
+    {
+      "fecha": "2026-03-10",
+      "descripcion": "TELCEL PAGO PLAN ILIMITADO",
+      "comercio": "Telcel",
+      "monto": 349.00,
+      "tipo": "cargo",
+      "categoria": "servicios",
+      "confianza": 0.98
+    },
+    {
+      "fecha": "2026-03-11",
+      "descripcion": "ZARA SANTA FE",
+      "comercio": "Zara",
+      "monto": 1299.00,
+      "tipo": "cargo",
+      "categoria": "vestimenta",
+      "confianza": 0.91
+    },
+    {
+      "fecha": "2026-03-12",
+      "descripcion": "RESTAURANTE EL CARDENAL",
+      "comercio": "El Cardenal",
+      "monto": 560.00,
+      "tipo": "cargo",
+      "categoria": "alimentacion",
+      "confianza": 0.89
+    },
+    {
+      "fecha": "2026-03-13",
+      "descripcion": "UBER EATS PEDIDO",
+      "comercio": "Uber Eats",
+      "monto": 195.00,
+      "tipo": "cargo",
+      "categoria": "alimentacion",
+      "confianza": 0.94
+    },
+    {
+      "fecha": "2026-03-14",
+      "descripcion": "AMAZON MEXICO COMPRA",
+      "comercio": "Amazon",
+      "monto": 749.00,
+      "tipo": "cargo",
+      "categoria": "hogar",
+      "confianza": 0.85
+    },
+    {
+      "fecha": "2026-03-15",
+      "descripcion": "TRANSFERENCIA SPEI ENVIADA",
+      "comercio": null,
+      "monto": 2500.00,
+      "tipo": "transferencia_enviada",
+      "categoria": "transferencia",
+      "confianza": 0.99
+    },
+    {
+      "fecha": "2026-03-16",
+      "descripcion": "STARBUCKS INSURGENTES",
+      "comercio": "Starbucks",
+      "monto": 148.00,
+      "tipo": "cargo",
+      "categoria": "alimentacion",
+      "confianza": 0.96
+    },
+    {
+      "fecha": "2026-03-17",
+      "descripcion": "LIVERPOOL INSURGENTES",
+      "comercio": "Liverpool",
+      "monto": 2100.00,
+      "tipo": "cargo",
+      "categoria": "vestimenta",
+      "confianza": 0.90
+    },
+    {
+      "fecha": "2026-03-18",
+      "descripcion": "CUOTA AUTOPISTA MEXICO-TOLUCA",
+      "comercio": "CAPUFE",
+      "monto": 95.00,
+      "tipo": "cargo",
+      "categoria": "transporte",
+      "confianza": 0.92
+    },
+    {
+      "fecha": "2026-03-19",
+      "descripcion": "CONSULTA MÉDICA DR GARCÍA",
+      "comercio": null,
+      "monto": 800.00,
+      "tipo": "cargo",
+      "categoria": "salud",
+      "confianza": 0.88
+    },
+    {
+      "fecha": "2026-03-20",
+      "descripcion": "LA COMER PERISUR",
+      "comercio": "La Comer",
+      "monto": 680.50,
+      "tipo": "cargo",
+      "categoria": "alimentacion",
+      "confianza": 0.95
+    },
+    {
+      "fecha": "2026-03-21",
+      "descripcion": "COMISION MANTENIMIENTO CUENTA",
+      "comercio": null,
+      "monto": 120.00,
+      "tipo": "comision",
+      "categoria": "comisiones",
+      "confianza": 0.99
+    },
+    {
+      "fecha": "2026-03-22",
+      "descripcion": "HBO MAX SUSCRIPCION",
+      "comercio": "HBO Max",
+      "monto": 149.00,
+      "tipo": "cargo",
+      "categoria": "entretenimiento",
+      "confianza": 0.99
+    },
+    {
+      "fecha": "2026-03-23",
+      "descripcion": "GASOLINERA BP PERIFÉRICO",
+      "comercio": "BP",
+      "monto": 550.00,
+      "tipo": "cargo",
+      "categoria": "transporte",
+      "confianza": 0.93
+    },
+    {
+      "fecha": "2026-03-24",
+      "descripcion": "IKEA MEXICALI",
+      "comercio": "IKEA",
+      "monto": 3200.00,
+      "tipo": "cargo",
+      "categoria": "hogar",
+      "confianza": 0.94
+    },
+    {
+      "fecha": "2026-03-25",
+      "descripcion": "TELMEX INTERNET FIBRA",
+      "comercio": "Telmex",
+      "monto": 399.00,
+      "tipo": "cargo",
+      "categoria": "servicios",
+      "confianza": 0.98
+    },
+    {
+      "fecha": "2026-03-26",
+      "descripcion": "CERVECERÍA REFORMA CENA",
+      "comercio": "Cervecería de Barrio",
+      "monto": 420.00,
+      "tipo": "cargo",
+      "categoria": "alimentacion",
+      "confianza": 0.87
+    },
+    {
+      "fecha": "2026-03-27",
+      "descripcion": "SEGURO GASTOS MEDICOS AXA",
+      "comercio": "AXA Seguros",
+      "monto": 980.00,
+      "tipo": "cargo",
+      "categoria": "seguros",
+      "confianza": 0.96
+    },
+    {
+      "fecha": "2026-03-28",
+      "descripcion": "RETIRO CAJERO BANAMEX",
+      "comercio": null,
+      "monto": 1000.00,
+      "tipo": "retiro",
+      "categoria": "otros",
+      "confianza": 0.99
+    },
+    {
+      "fecha": "2026-03-29",
+      "descripcion": "COURSERA SUSCRIPCION ANUAL",
+      "comercio": "Coursera",
+      "monto": 599.00,
+      "tipo": "cargo",
+      "categoria": "educacion",
+      "confianza": 0.92
+    },
+    {
+      "fecha": "2026-03-30",
+      "descripcion": "ISR PAGO IMPUESTO SAT",
+      "comercio": "SAT",
+      "monto": 820.15,
+      "tipo": "cargo",
+      "categoria": "impuestos",
+      "confianza": 0.97
+    },
+    {
+      "fecha": "2026-03-31",
+      "descripcion": "OXXO GAS SATELITE",
+      "comercio": "OXXO Gas",
+      "monto": 450.00,
+      "tipo": "cargo",
+      "categoria": "transporte",
+      "confianza": 0.94
+    }
+  ],
+  "advertencias": []
+}

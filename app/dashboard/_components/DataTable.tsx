@@ -6,25 +6,25 @@ interface CategoryMeta {
 }
 
 const CATEGORY: Record<string, CategoryMeta> = {
-  alimentacion:        { label: 'Alimentación',  classes: 'bg-ambar-light   text-ambar-dark'   },
-  transporte:          { label: 'Transporte',     classes: 'bg-celeste-light text-celeste-dark' },
-  entretenimiento:     { label: 'Entret.',        classes: 'bg-rosa-light    text-rosa-dark'    },
-  salud:               { label: 'Salud',          classes: 'bg-menta-light   text-menta-dark'   },
-  educacion:           { label: 'Educación',      classes: 'bg-lavanda-light text-lavanda-dark' },
-  servicios:           { label: 'Servicios',      classes: 'bg-celeste-light text-celeste-dark' },
-  vestimenta:          { label: 'Vestimenta',     classes: 'bg-rosa-light    text-rosa-dark'    },
-  ropa_calzado:        { label: 'Vestimenta',     classes: 'bg-rosa-light    text-rosa-dark'    },
-  hogar:               { label: 'Hogar',          classes: 'bg-ambar-light   text-ambar-dark'   },
-  viajes:              { label: 'Viajes',         classes: 'bg-celeste-light text-celeste-dark' },
-  nomina:              { label: 'Nómina',         classes: 'bg-menta-light   text-menta-dark'   },
-  nomina_ingreso:      { label: 'Nómina',         classes: 'bg-menta-light   text-menta-dark'   },
-  transferencia:       { label: 'Transferencia',  classes: 'bg-lavanda-light text-lavanda-dark' },
-  inversiones:         { label: 'Inversiones',    classes: 'bg-lavanda-light text-lavanda-dark' },
-  impuestos:           { label: 'Impuestos',      classes: 'bg-durazno-light text-durazno-dark' },
-  seguros:             { label: 'Seguros',        classes: 'bg-celeste-light text-celeste-dark' },
-  comisiones:          { label: 'Comisiones',     classes: 'bg-durazno-light text-durazno-dark' },
-  comisiones_bancarias:{ label: 'Comisiones',     classes: 'bg-durazno-light text-durazno-dark' },
-  otros:               { label: 'Otros',          classes: 'bg-neutral-100   text-neutral-400'  },
+  alimentacion: { label: 'Alimentación', classes: 'bg-ambar-light   text-ambar-dark' },
+  transporte: { label: 'Transporte', classes: 'bg-celeste-light text-celeste-dark' },
+  entretenimiento: { label: 'Entret.', classes: 'bg-rosa-light    text-rosa-dark' },
+  salud: { label: 'Salud', classes: 'bg-menta-light   text-menta-dark' },
+  educacion: { label: 'Educación', classes: 'bg-lavanda-light text-lavanda-dark' },
+  servicios: { label: 'Servicios', classes: 'bg-celeste-light text-celeste-dark' },
+  vestimenta: { label: 'Vestimenta', classes: 'bg-rosa-light    text-rosa-dark' },
+  ropa_calzado: { label: 'Vestimenta', classes: 'bg-rosa-light    text-rosa-dark' },
+  hogar: { label: 'Hogar', classes: 'bg-ambar-light   text-ambar-dark' },
+  viajes: { label: 'Viajes', classes: 'bg-celeste-light text-celeste-dark' },
+  nomina: { label: 'Nómina', classes: 'bg-menta-light   text-menta-dark' },
+  nomina_ingreso: { label: 'Nómina', classes: 'bg-menta-light   text-menta-dark' },
+  transferencia: { label: 'Transferencia', classes: 'bg-lavanda-light text-lavanda-dark' },
+  inversiones: { label: 'Inversiones', classes: 'bg-lavanda-light text-lavanda-dark' },
+  impuestos: { label: 'Impuestos', classes: 'bg-durazno-light text-durazno-dark' },
+  seguros: { label: 'Seguros', classes: 'bg-celeste-light text-celeste-dark' },
+  comisiones: { label: 'Comisiones', classes: 'bg-durazno-light text-durazno-dark' },
+  comisiones_bancarias: { label: 'Comisiones', classes: 'bg-durazno-light text-durazno-dark' },
+  otros: { label: 'Otros', classes: 'bg-neutral-100   text-neutral-400' },
 }
 
 const CARGO_TYPES = new Set([
@@ -42,9 +42,9 @@ export default function DataTable({ transactions }: Props) {
     <section className="bg-white rounded-2xl p-6 shadow-sm">
       <h2 className="text-lg font-semibold text-neutral-900 mb-4">Transacciones</h2>
 
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto overflow-y-auto max-h-[540px]">
         <table className="w-full text-sm">
-          <thead>
+          <thead className="sticky top-0 bg-white">
             <tr className="border-b border-neutral-200">
               {columns.map(col => (
                 <th

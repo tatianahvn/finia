@@ -82,7 +82,6 @@ export default function FileUpload({ onAnalysisComplete }: Props) {
       }
 
       const { data } = await analyzeRes.json()
-      console.log(data)
       onAnalysisComplete(data)
       setStatus('done')
     } catch {
