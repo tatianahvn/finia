@@ -40,7 +40,11 @@ interface Props {
 export default function DataTable({ transactions }: Props) {
   return (
     <section className="bg-white rounded-2xl p-6 shadow-sm">
-      <h2 className="text-lg font-semibold text-neutral-900 mb-4">Transacciones</h2>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-sm font-bold tracking-widest text-violet-700 uppercase">
+          Transacciones
+        </h2>
+      </div>
 
       <div className="overflow-x-auto overflow-y-auto max-h-[540px]">
         <table className="w-full text-sm">

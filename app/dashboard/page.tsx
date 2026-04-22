@@ -5,6 +5,8 @@ import FileUpload from './_components/FileUpload'
 import StatCards from './_components/StatCards'
 import DataTable from './_components/DataTable'
 import InsightsPanel from './_components/InsightsPanel'
+import SpendingByCategory from './_components/SpendingByCategory'
+import FinancialAdvice from './_components/FinancialAdvice'
 import type { ParsedStatement } from '@/types/statements'
 import mockStatement from '@/lib/mock/statement.json'
 
@@ -28,6 +30,8 @@ export default function Dashboard() {
         <DataTable transactions={statement?.transacciones ?? []} />
         <InsightsPanel transactions={statement?.transacciones ?? []} />
       </div>
+      <SpendingByCategory transactions={statement?.transacciones ?? []} />
+      <FinancialAdvice transactions={statement?.transacciones ?? []} />
     </div>
   )
 }
