@@ -43,7 +43,6 @@ export default function StatCards({ resumen, count }: Props) {
 
   return (
     <section>
-      <h2 className="text-lg font-semibold text-neutral-900 mb-4">Resumen</h2>
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         {stats.map(({ label, value, icon: Icon, badgeClass, iconClass }) => (
           <div key={label} className="bg-white rounded-2xl p-5 shadow-sm flex items-center gap-4">

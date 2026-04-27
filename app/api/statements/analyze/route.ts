@@ -60,14 +60,21 @@ export async function POST(request: NextRequest) {
   try {
     const data = await analyzeStatementText(text)
 
-    // Persist analysis — non-blocking, failure doesn't affect the response
-    await supabase.from("analyses").insert({
+    const { error: insertError } = await supabase.from("analyses").insert({
       user_id: user.id,
       filename: filename ?? "sin_nombre",
       resumen: data.resumen as unknown as Record<string, unknown>,
       transacciones: data.transacciones as unknown as Record<string, unknown>[],
       advertencias: data.advertencias as unknown as string[],
     })
+
+    if (insertError) {
+      console.error("[analyses] insert failed:", insertError.message)
+      return NextResponse.json(
+        { error: "No se pudo guardar el análisis. Intenta de nuevo." },
+        { status: 500 }
+      )
+    }
 
     return NextResponse.json({
       success: true,

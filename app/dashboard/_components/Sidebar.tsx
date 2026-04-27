@@ -13,12 +13,12 @@ import {
 } from 'lucide-react'
 
 const navItems = [
-  { href: '/dashboard',              label: 'Resumen',        icon: LayoutDashboard },
-  { href: '/dashboard/analizar',     label: 'Analizar',       icon: ScanText        },
-  { href: '/dashboard/transacciones',label: 'Transacciones',  icon: ArrowLeftRight  },
-  { href: '/dashboard/reportes',     label: 'Reportes',       icon: BarChart2       },
-  { href: '/dashboard/consejos',     label: 'Consejos',       icon: Lightbulb       },
-  { href: '/dashboard/perfil',       label: 'Perfil',         icon: UserCircle      },
+  { href: '/dashboard', label: 'Resumen', icon: LayoutDashboard },
+  { href: '/dashboard/analizar', label: 'Analizar', icon: ScanText },
+  { href: '/dashboard/transacciones', label: 'Transacciones', icon: ArrowLeftRight },
+  { href: '/dashboard/reportes', label: 'Reportes', icon: BarChart2 },
+  { href: '/dashboard/consejos', label: 'Consejos', icon: Lightbulb },
+  { href: '/dashboard/perfil', label: 'Perfil', icon: UserCircle },
 ]
 
 export default function Sidebar() {
@@ -40,11 +40,10 @@ export default function Sidebar() {
             <Link
               key={href}
               href={href}
-              className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
-                isActive
-                  ? 'bg-violet-100 text-violet-800 font-semibold'
-                  : 'text-neutral-500 hover:bg-violet-50 hover:text-violet-800'
-              }`}
+              className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${isActive
+                ? 'bg-violet-100 text-violet-800 font-semibold'
+                : 'text-neutral-500 hover:bg-violet-50 hover:text-violet-800'
+                }`}
             >
               <Icon size={17} />
               {label}
@@ -57,7 +56,7 @@ export default function Sidebar() {
         <div className="rounded-xl bg-violet-700 p-4">
           <div className="flex items-center gap-1.5 mb-1">
             <Zap size={13} className="text-violet-200" />
-            <p className="text-sm font-semibold text-white">Mejora tu plan</p>
+            <p className="text-sm font-semibold text-white">Obtén más créditos</p>
           </div>
           <p className="text-xs text-violet-200 leading-relaxed mb-3">
             Más análisis y funciones avanzadas para tus finanzas
@@ -66,7 +65,7 @@ export default function Sidebar() {
             href="/upgrade"
             className="block text-center text-xs font-semibold bg-white text-violet-700 rounded-lg py-1.5 hover:bg-violet-50 transition-colors"
           >
-            Ver planes →
+            Créditos →
           </Link>
         </div>
       </div>

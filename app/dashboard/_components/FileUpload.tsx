@@ -69,20 +69,22 @@ export default function FileUpload({ onAnalysisComplete }: Props) {
       if (!parsed?.length) throw new Error('No se pudo extraer texto del PDF')
 
       setResults(parsed)
-      const { text, name } = parsed[0]
 
-      const analyzeRes = await fetch('/api/statements/analyze', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text, filename: name }),
-      })
-      if (!analyzeRes.ok) {
-        const { error } = await analyzeRes.json()
-        throw new Error(error ?? 'Error al analizar el estado de cuenta')
+      for (const { text, name } of parsed) {
+        const analyzeRes = await fetch('/api/statements/analyze', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text, filename: name }),
+        })
+        if (!analyzeRes.ok) {
+          const { error } = await analyzeRes.json()
+          throw new Error(error ?? 'Error al analizar el estado de cuenta')
+        }
+
+        const { data } = await analyzeRes.json()
+        onAnalysisComplete(data)
       }
 
-      const { data } = await analyzeRes.json()
-      onAnalysisComplete(data)
       setStatus('done')
     } catch {
       setStatus('error')

@@ -7,10 +7,10 @@ import type { ParsedStatement } from '@/types/statements'
 
 export default function AnalizarPage() {
   const router = useRouter()
-  const { setStatement } = useAnalysis()
+  const { addStatement } = useAnalysis()
 
   function handleAnalysisComplete(data: ParsedStatement) {
-    setStatement(data)
+    addStatement(data)
     router.push('/dashboard')
   }
 

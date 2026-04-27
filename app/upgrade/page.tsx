@@ -5,8 +5,6 @@ interface Plan {
   name: string
   badge?: string
   price: number
-  period: string
-  usd?: string
   credits: string
   features: string[]
   cta: string
@@ -15,26 +13,22 @@ interface Plan {
 
 const plans: Plan[] = [
   {
-    name: 'Prueba',
-    price: 29,
-    period: 'pago único',
-    usd: '~$1.50 USD',
-    credits: '3 análisis',
+    name: '',
+    price: 49,
+    credits: '5 Créditos',
     features: [
       'Tabla de transacciones',
       'Categorías automáticas',
-      '4 consejos financieros',
+      'Hasta 15 consejos financieros',
     ],
     cta: 'Comenzar',
     featured: false,
   },
   {
-    name: 'Pack mensual',
-    badge: '⭐ Más popular',
-    price: 69,
-    period: 'pago único',
-    usd: '~$3.50 USD',
-    credits: '10 análisis',
+    name: '',
+    badge: '⭐️ Más popular',
+    price: 199,
+    credits: '22 Créditos',
     features: [
       'Todo lo anterior',
       'Export a PDF',
@@ -44,10 +38,9 @@ const plans: Plan[] = [
     featured: true,
   },
   {
-    name: 'Acceso anual',
+    name: '',
     price: 499,
-    period: 'por 12 meses',
-    credits: 'Ilimitado',
+    credits: '55 Créditos',
     features: [
       'Todo incluido',
       'Historial completo',
@@ -107,48 +100,39 @@ function PlanCard({ plan }: { plan: Plan }) {
 
   return (
     <div
-      className={`relative flex flex-col rounded-2xl p-6 transition-all ${
-        featured
-          ? 'bg-violet-700 text-white shadow-elevated scale-105'
-          : 'bg-white text-neutral-900 shadow-card border border-neutral-100'
-      }`}
+      className={`relative flex flex-col rounded-2xl p-6 transition-all ${featured
+        ? 'bg-violet-700 text-white shadow-elevated scale-105'
+        : 'bg-white text-neutral-900 shadow-card border border-neutral-100'
+        }`}
     >
       {plan.badge && (
         <span
-          className={`absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${
-            featured
-              ? 'bg-white text-violet-700'
-              : 'bg-violet-100 text-violet-700'
-          }`}
+          className={`absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${featured
+            ? 'bg-white text-violet-700'
+            : 'bg-violet-100 text-violet-700'
+            }`}
         >
           {plan.badge}
         </span>
       )}
 
-      <div className="mb-5">
-        <p className={`text-sm font-semibold mb-3 ${featured ? 'text-violet-200' : 'text-neutral-400'}`}>
-          {plan.name}
-        </p>
-        <div className="flex items-end gap-1.5 mb-1">
-          <span className="text-4xl font-bold">${plan.price}</span>
-          <span className={`text-sm mb-1 ${featured ? 'text-violet-300' : 'text-neutral-400'}`}>
-            MXN
-          </span>
-        </div>
-        <p className={`text-xs ${featured ? 'text-violet-300' : 'text-neutral-400'}`}>
-          {plan.period}{plan.usd ? ` · ${plan.usd}` : ''}
-        </p>
-      </div>
-
       <div
-        className={`flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 mb-5 ${
-          featured ? 'bg-white/15' : 'bg-violet-50'
-        }`}
+        className={`flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 mb-5 ${featured ? 'bg-white/15' : 'bg-violet-50'
+          }`}
       >
         <Zap size={14} className={featured ? 'text-violet-200' : 'text-violet-500'} />
         <span className={`text-sm font-semibold ${featured ? 'text-white' : 'text-violet-700'}`}>
           {plan.credits}
         </span>
+      </div>
+
+      <div className="flex items-center mb-5">
+        <div className="flex gap-1.5 mb-1">
+          <span className="text-4xl font-bold">${plan.price}</span>
+          <span className={`text-sm mb-1 ${featured ? 'text-violet-300' : 'text-neutral-400'}`}>
+            MXN
+          </span>
+        </div>
       </div>
 
       <ul className="flex flex-col gap-2.5 mb-6 flex-1">
@@ -167,11 +151,10 @@ function PlanCard({ plan }: { plan: Plan }) {
 
       <button
         type="button"
-        className={`w-full py-3 rounded-xl text-sm font-semibold transition-colors ${
-          featured
-            ? 'bg-white text-violet-700 hover:bg-violet-50'
-            : 'bg-violet-700 text-white hover:bg-violet-800'
-        }`}
+        className={`w-full py-3 rounded-xl text-sm font-semibold transition-colors ${featured
+          ? 'bg-white text-violet-700 hover:bg-violet-50'
+          : 'bg-violet-700 text-white hover:bg-violet-800'
+          }`}
       >
         {plan.cta}
       </button>

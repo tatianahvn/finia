@@ -37,13 +37,46 @@ interface Props {
   transactions: Transaction[]
 }
 
+function fmt(n: number) {
+  return n.toLocaleString('es-MX', { minimumFractionDigits: 2 })
+}
+
 export default function DataTable({ transactions }: Props) {
+  const ingresos = transactions
+    .filter(tx => !CARGO_TYPES.has(tx.tipo))
+    .reduce((sum, tx) => sum + tx.monto, 0)
+
+  const egresos = transactions
+    .filter(tx => CARGO_TYPES.has(tx.tipo))
+    .reduce((sum, tx) => sum + tx.monto, 0)
+
+  const balance = ingresos - egresos
+
   return (
     <section className="bg-white rounded-2xl p-6 shadow-sm flex flex-col h-full">
-      <div className="shrink-0 flex items-center justify-between mb-6">
+      <div className="shrink-0 flex items-center justify-between mb-4">
         <h2 className="text-sm font-bold tracking-widest text-violet-700 uppercase">
           Transacciones
         </h2>
+      </div>
+
+      <div className="shrink-0 grid grid-cols-4 gap-3 mb-6">
+        <div className="rounded-xl bg-emerald-50 px-4 py-3">
+          <p className="text-xs font-medium text-emerald-600 tracking-wide mb-1">Ingresos</p>
+          <p className="text-base font-bold text-emerald-700">${fmt(ingresos)}</p>
+        </div>
+        <div className="rounded-xl bg-red-50 px-4 py-3">
+          <p className="text-xs font-medium text-red-500 tracking-wide mb-1">Egresos</p>
+          <p className="text-base font-bold text-red-600">${fmt(egresos)}</p>
+        </div>
+        <div className={`rounded-xl px-4 py-3 ${balance >= 0 ? 'bg-emerald-50' : 'bg-red-50'}`}>
+          <p className={`text-xs font-medium tracking-wide mb-1 ${balance >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>Balance</p>
+          <p className={`text-base font-bold ${balance >= 0 ? 'text-emerald-700' : 'text-red-600'}`}>{balance >= 0 ? '+' : '-'}${fmt(Math.abs(balance))}</p>
+        </div>
+        <div className="rounded-xl bg-violet-50 px-4 py-3">
+          <p className="text-xs font-medium text-violet-600 tracking-wide mb-1">Transacciones</p>
+          <p className="text-base font-bold text-violet-700">{transactions.length}</p>
+        </div>
       </div>
 
       <div className="flex-1 min-h-0 overflow-x-auto overflow-y-auto">
