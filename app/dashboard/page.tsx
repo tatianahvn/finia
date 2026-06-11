@@ -1,12 +1,20 @@
 'use client'
 
+import { useMemo } from 'react'
 import { useAnalysis } from '@/lib/context/analysis'
 import StatCards from './_components/StatCards'
+import MonthlySpendingChart from './_components/MonthlySpendingChart'
 import RecentTransactions from './_components/RecentTransactions'
 import EmptyAnalysisCTA from './_components/EmptyAnalysisCTA'
 
 export default function Dashboard() {
   const { statement, loading } = useAnalysis()
+
+  const months = useMemo(() => {
+    if (!statement) return []
+    const set = new Set(statement.transacciones.map(tx => tx.fecha.slice(0, 7)))
+    return Array.from(set).sort()
+  }, [statement])
 
   if (loading) {
     return (
@@ -42,10 +50,16 @@ export default function Dashboard() {
         <EmptyAnalysisCTA />
       ) : (
         <>
-          <StatCards
-            resumen={statement.resumen}
-            count={statement.transacciones.length}
-          />
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <StatCards
+              resumen={statement.resumen}
+              count={statement.transacciones.length}
+            />
+            <MonthlySpendingChart
+              transactions={statement.transacciones}
+              months={months}
+            />
+          </div>
           <RecentTransactions transactions={statement.transacciones} />
         </>
       )}

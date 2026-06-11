@@ -2,30 +2,17 @@
 
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import type { ParsedStatement, StatementSummary, Transaction } from '@/types/statements'
+import type { Category, ParsedStatement, StatementSummary, Transaction } from '@/types/statements'
 
 interface AnalysisContextValue {
   statement: ParsedStatement | null
   setStatement: (s: ParsedStatement | null) => void
-  addStatement: (s: ParsedStatement) => void
+  updateTransactionCategory: (id: string, categoria: Category) => void
   refresh: () => Promise<void>
   loading: boolean
 }
 
 const AnalysisContext = createContext<AnalysisContextValue | null>(null)
-
-function mergeTransactions(existing: Transaction[], incoming: Transaction[]): Transaction[] {
-  const seen = new Set(existing.map(tx => `${tx.fecha}|${tx.descripcion}|${tx.monto}|${tx.tipo}`))
-  const merged = [...existing]
-  for (const tx of incoming) {
-    const key = `${tx.fecha}|${tx.descripcion}|${tx.monto}|${tx.tipo}`
-    if (!seen.has(key)) {
-      seen.add(key)
-      merged.push(tx)
-    }
-  }
-  return merged.sort((a, b) => a.fecha.localeCompare(b.fecha))
-}
 
 export function AnalysisProvider({ children }: { children: ReactNode }) {
   const [statement, setStatement] = useState<ParsedStatement | null>(null)
@@ -40,26 +27,33 @@ export function AnalysisProvider({ children }: { children: ReactNode }) {
       return
     }
 
-    const { data } = await supabase
-      .from('analyses')
-      .select('resumen, transacciones, advertencias')
+    // Resumen + advertencias del estado de cuenta más reciente.
+    const { data: latest } = await supabase
+      .from('statements')
+      .select('resumen, advertencias')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
 
-    if (data && data.length > 0) {
-      const allTransactions = mergeTransactions(
-        [],
-        data.flatMap(row => row.transacciones as unknown as Transaction[])
-      )
-
-      setStatement({
-        resumen: data[0].resumen as unknown as StatementSummary,
-        transacciones: allTransactions,
-        advertencias: (data[0].advertencias ?? []) as unknown as string[],
-      })
-    } else {
+    if (!latest) {
       setStatement(null)
+      setLoading(false)
+      return
     }
+
+    // Vista unificada de transacciones (cross-banco, cross-archivo) con ids reales.
+    const { data: txs } = await supabase
+      .from('transactions')
+      .select('id, fecha, descripcion, comercio, monto, tipo, categoria, confianza')
+      .eq('user_id', user.id)
+      .order('fecha', { ascending: true })
+
+    setStatement({
+      resumen: latest.resumen as unknown as StatementSummary,
+      transacciones: (txs ?? []) as unknown as Transaction[],
+      advertencias: (latest.advertencias ?? []) as unknown as string[],
+    })
     setLoading(false)
   }, [])
 
@@ -70,19 +64,20 @@ export function AnalysisProvider({ children }: { children: ReactNode }) {
     run()
   }, [refresh])
 
-  const addStatement = useCallback((incoming: ParsedStatement) => {
+  const updateTransactionCategory = useCallback((id: string, categoria: Category) => {
     setStatement(prev => {
-      if (!prev) return incoming
+      if (!prev) return prev
       return {
-        resumen: incoming.resumen,
-        transacciones: mergeTransactions(prev.transacciones, incoming.transacciones),
-        advertencias: incoming.advertencias,
+        ...prev,
+        transacciones: prev.transacciones.map(tx =>
+          tx.id === id ? { ...tx, categoria, confianza: 1 } : tx
+        ),
       }
     })
   }, [])
 
   return (
-    <AnalysisContext.Provider value={{ statement, setStatement, addStatement, refresh, loading }}>
+    <AnalysisContext.Provider value={{ statement, setStatement, updateTransactionCategory, refresh, loading }}>
       {children}
     </AnalysisContext.Provider>
   )

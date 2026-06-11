@@ -1,3 +1,5 @@
+'use client'
+
 import type { Transaction } from '@/types/statements'
 import { getCategoryMeta } from '@/lib/categories'
 
@@ -79,7 +81,7 @@ export default function DataTable({ transactions }: Props) {
                 const esCargo = CARGO_TYPES.has(tx.tipo)
                 const meta = getCategoryMeta(tx.categoria)
                 return (
-                  <tr key={i} className="border-b border-neutral-100 last:border-0 hover:bg-neutral-50">
+                  <tr key={tx.id ?? i} className="border-b border-neutral-100 last:border-0 hover:bg-neutral-50">
                     <td className="py-3 pr-4 text-neutral-500 whitespace-nowrap">
                       {tx.fecha}
                     </td>
@@ -87,7 +89,8 @@ export default function DataTable({ transactions }: Props) {
                       {tx.comercio ?? tx.descripcion}
                     </td>
                     <td className="py-3 pr-4">
-                      <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${meta.badgeClasses}`}>
+                      <span className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full ${meta.badgeClasses}`}>
+                        <span aria-hidden>{meta.emoji}</span>
                         {meta.label}
                       </span>
                     </td>

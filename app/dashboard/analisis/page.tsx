@@ -6,7 +6,6 @@ import { useAnalysis } from '@/lib/context/analysis'
 import { useAdviceHistory } from '@/lib/hooks/useAdviceHistory'
 import SpendingByCategory from '../_components/SpendingByCategory'
 import SpendingByConcept from '../_components/SpendingByConcept'
-import MonthlySpendingChart from '../_components/MonthlySpendingChart'
 import AdviceModal from '../_components/AdviceModal'
 import EmptyAnalysisCTA from '../_components/EmptyAnalysisCTA'
 
@@ -176,17 +175,10 @@ export default function AnalisisPage() {
           </div>
         </div>
 
-        {/* Top row: monthly trend (all months) + category breakdown (filtered month) */}
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_2fr]">
-          <MonthlySpendingChart
-            transactions={statement.transacciones}
-            months={months}
-          />
+        {/* Category breakdown (filtered month) */}
+        <SpendingByCategory transactions={filtered} />
 
-          <SpendingByCategory transactions={filtered} />
-        </div>
-
-        {/* Bottom row: concept breakdown (filtered month) */}
+        {/* Concept breakdown (filtered month) */}
         <SpendingByConcept transactions={filtered} />
       </div>
 

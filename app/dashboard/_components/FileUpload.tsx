@@ -1,8 +1,10 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { UploadCloud } from 'lucide-react'
+import { UploadCloud, FlaskConical } from 'lucide-react'
 import FileItem from './FileItem'
+import StatementReviewModal from './StatementReviewModal'
+import { DUMMY_FILENAME, DUMMY_STATEMENT } from '@/lib/fixtures/dummyStatement'
 import type { ParsedStatement } from '@/types/statements'
 
 type ParsedResult = {
@@ -11,92 +13,132 @@ type ParsedResult = {
   text: string
 }
 
-type UploadState = 'idle' | 'loading' | 'done' | 'error'
+type UploadState = 'idle' | 'loading' | 'error'
 
 interface Props {
-  onAnalysisComplete: (data: ParsedStatement) => void
+  /** Se invoca tras guardar el estado de cuenta en la BD. */
+  onSaved: () => void | Promise<void>
 }
 
-export default function FileUpload({ onAnalysisComplete }: Props) {
+export default function FileUpload({ onSaved }: Props) {
   const [isDragging, setIsDragging] = useState(false)
-  const [files, setFiles] = useState<File[]>([])
+  const [file, setFile] = useState<File | null>(null)
   const [status, setStatus] = useState<UploadState>('idle')
-  const [results, setResults] = useState<ParsedResult[]>([])
+  const [errorMsg, setErrorMsg] = useState<string | null>(null)
+  const [review, setReview] = useState<{ filename: string; data: ParsedStatement } | null>(null)
+  const [saving, setSaving] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const addFiles = (incoming: FileList | File[]) => {
-    const pdfs = Array.from(incoming).filter(f => f.type === 'application/pdf')
-    setFiles(prev => {
-      const existing = new Set(prev.map(f => f.name))
-      return [...prev, ...pdfs.filter(f => !existing.has(f.name))]
-    })
+  const setSingleFile = (incoming: FileList | File[]) => {
+    const pdf = Array.from(incoming).find(f => f.type === 'application/pdf')
+    if (!pdf) return
+    const tooMany = Array.from(incoming).filter(f => f.type === 'application/pdf').length > 1
+    setFile(pdf)
     setStatus('idle')
-    setResults([])
+    setErrorMsg(tooMany ? 'Solo puedes cargar un PDF a la vez. Se tomó el primero.' : null)
   }
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault()
     setIsDragging(false)
-    addFiles(e.dataTransfer.files)
+    setSingleFile(e.dataTransfer.files)
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) addFiles(e.target.files)
+    if (e.target.files) setSingleFile(e.target.files)
   }
 
-  const removeFile = (index: number) => {
-    setFiles(prev => prev.filter((_, i) => i !== index))
+  const removeFile = () => {
+    setFile(null)
     setStatus('idle')
-    setResults([])
+    setErrorMsg(null)
+    if (inputRef.current) inputRef.current.value = ''
   }
 
   const handleConfirm = async () => {
-    if (!files.length) return
+    if (!file) return
     setStatus('loading')
-    setResults([])
+    setErrorMsg(null)
 
     try {
       const formData = new FormData()
-      files.forEach(f => formData.append('files', f))
+      formData.append('files', file)
 
       const res = await fetch('/api/statements/parse-pdf', { method: 'POST', body: formData })
       if (!res.ok) {
         const { error } = await res.json()
-        throw new Error(error ?? 'Error al procesar los archivos')
+        throw new Error(error ?? 'Error al procesar el archivo')
       }
 
-      const { results: parsed }: { results: ParsedResult[] } = await res.json()
-      if (!parsed?.length) throw new Error('No se pudo extraer texto del PDF')
+      const { results }: { results: ParsedResult[] } = await res.json()
+      const parsed = results?.[0]
+      if (!parsed?.text) throw new Error('No se pudo extraer texto del PDF')
 
-      setResults(parsed)
-      console.log(parsed)
-
-      for (const { text, name } of parsed) {
-        const analyzeRes = await fetch('/api/statements/analyze', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text, filename: name }),
-        })
-        if (!analyzeRes.ok) {
-          const { error } = await analyzeRes.json()
-          throw new Error(error ?? 'Error al analizar el estado de cuenta')
-        }
-
-        const { data } = await analyzeRes.json()
-        onAnalysisComplete(data)
+      const analyzeRes = await fetch('/api/statements/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: parsed.text, filename: parsed.name }),
+      })
+      if (!analyzeRes.ok) {
+        const { error } = await analyzeRes.json()
+        throw new Error(error ?? 'Error al analizar el estado de cuenta')
       }
 
-      setStatus('done')
-    } catch {
+      const { data }: { data: ParsedStatement } = await analyzeRes.json()
+      setReview({ filename: parsed.name, data })
+      setStatus('idle')
+    } catch (err) {
       setStatus('error')
+      setErrorMsg(err instanceof Error ? err.message : 'Error al procesar el archivo. Intenta de nuevo.')
     }
   }
 
+  const handleSave = async (edited: ParsedStatement) => {
+    if (!review) return
+    setSaving(true)
+    try {
+      const res = await fetch('/api/statements', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filename: review.filename, data: edited }),
+      })
+      if (!res.ok) {
+        const { error } = await res.json()
+        throw new Error(error ?? 'No se pudo guardar el estado de cuenta')
+      }
 
+      setReview(null)
+      removeFile()
+      await onSaved()
+    } catch (err) {
+      setErrorMsg(err instanceof Error ? err.message : 'No se pudo guardar el estado de cuenta')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  // Abre el modal con datos de prueba, sin llamar a parse/analyze: cero créditos
+  // y cero tokens de IA. Solo visible en desarrollo.
+  const loadDummy = () => {
+    setErrorMsg(null)
+    setReview({ filename: DUMMY_FILENAME, data: structuredClone(DUMMY_STATEMENT) })
+  }
 
   return (
     <section className="bg-white rounded-2xl p-6 shadow-sm">
-      <h2 className="text-lg font-semibold text-neutral-900 mb-4">Cargar archivos</h2>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-semibold text-neutral-900">Cargar archivo</h2>
+        {process.env.NODE_ENV !== 'production' && (
+          <button
+            onClick={loadDummy}
+            title="Abre el modal con datos de prueba, sin consumir créditos ni tokens"
+            className="flex items-center gap-1 text-xs text-neutral-400 hover:text-violet-700 transition-colors"
+          >
+            <FlaskConical size={13} />
+            Probar con PDF demo
+          </button>
+        )}
+      </div>
 
       <div className="grid grid-cols-3 gap-4 h-40">
 
@@ -114,56 +156,53 @@ export default function FileUpload({ onAnalysisComplete }: Props) {
           <input
             ref={inputRef}
             type="file"
-            multiple
             accept=".pdf,application/pdf"
             className="hidden"
             onChange={handleChange}
           />
           <UploadCloud size={32} className="text-neutral-400 mb-3" />
-          <p className="text-sm font-medium text-neutral-900">Arrastra tus archivos aquí</p>
+          <p className="text-sm font-medium text-neutral-900">Arrastra tu archivo aquí</p>
           <p className="text-xs text-neutral-400 mt-1">
             o <span className="text-violet-800 font-medium">selecciona</span> desde tu equipo
           </p>
-          <p className="text-xs text-neutral-400 mt-3">Solo PDF</p>
+          <p className="text-xs text-neutral-400 mt-3">Solo un PDF a la vez</p>
         </div>
 
-        {/* Columna derecha — lista de archivos */}
+        {/* Columna derecha — archivo seleccionado */}
         <div className="col-span-2 flex flex-col gap-3 min-h-0">
           <div className="flex-1 overflow-y-auto space-y-2 pr-1 min-h-0">
-            {files.length === 0 ? (
+            {!file ? (
               <div className="h-full flex items-center justify-center">
-                <p className="text-sm text-neutral-400">Sin archivos cargados</p>
+                <p className="text-sm text-neutral-400">Sin archivo cargado</p>
               </div>
             ) : (
-              files.map((file, i) => (
-                <FileItem key={file.name} file={file} onRemove={() => removeFile(i)} />
-              ))
+              <FileItem file={file} onRemove={removeFile} />
             )}
           </div>
 
-          {status === 'error' && (
-            <p className="text-xs text-red-500 text-center">Error al procesar los archivos. Intenta de nuevo.</p>
-          )}
-
-          {status === 'done' && (
-            <p className="text-xs text-menta text-center">
-              {results.length} archivo{results.length !== 1 ? 's' : ''} procesado{results.length !== 1 ? 's' : ''} correctamente
-            </p>
+          {errorMsg && (
+            <p className="text-xs text-red-500 text-center">{errorMsg}</p>
           )}
 
           <button
             onClick={handleConfirm}
-            disabled={files.length === 0 || status === 'loading'}
-            className="w-full py-2.5 rounded-xl bg-violet-800 text-white text-sm font-semibold hover:bg-violet-800 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            disabled={!file || status === 'loading'}
+            className="w-full py-2.5 rounded-xl bg-violet-800 text-white text-sm font-semibold hover:bg-violet-900 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {status === 'loading' ? 'Procesando...' : 'Confirmar carga'}
           </button>
         </div>
 
       </div>
+
+      <StatementReviewModal
+        open={!!review}
+        filename={review?.filename ?? ''}
+        statement={review?.data ?? null}
+        saving={saving}
+        onClose={() => { if (!saving) setReview(null) }}
+        onSave={handleSave}
+      />
     </section>
   )
 }
-
-
-

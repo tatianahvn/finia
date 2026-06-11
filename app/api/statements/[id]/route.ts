@@ -17,22 +17,23 @@ export async function DELETE(
     return NextResponse.json({ error: "No autenticado" }, { status: 401 })
   }
 
+  // Las transacciones asociadas se eliminan en cascada (FK on delete cascade).
   const { error, count } = await supabase
-    .from("analyses")
+    .from("statements")
     .delete({ count: "exact" })
     .eq("id", id)
     .eq("user_id", user.id)
 
   if (error) {
-    console.error("[analyses] delete failed:", error.message)
+    console.error("[statements] delete failed:", error.message)
     return NextResponse.json(
-      { error: "No se pudo eliminar el análisis" },
+      { error: "No se pudo eliminar el estado de cuenta" },
       { status: 500 }
     )
   }
 
   if (!count) {
-    return NextResponse.json({ error: "Análisis no encontrado" }, { status: 404 })
+    return NextResponse.json({ error: "Estado de cuenta no encontrado" }, { status: 404 })
   }
 
   return NextResponse.json({ success: true })

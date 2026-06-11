@@ -60,22 +60,10 @@ export async function POST(request: NextRequest) {
   try {
     const data = await analyzeStatementText(text)
 
-    const { error: insertError } = await supabase.from("analyses").insert({
-      user_id: user.id,
-      filename: filename ?? "sin_nombre",
-      resumen: data.resumen as unknown as Record<string, unknown>,
-      transacciones: data.transacciones as unknown as Record<string, unknown>[],
-      advertencias: data.advertencias as unknown as string[],
-    })
-
-    if (insertError) {
-      console.error("[analyses] insert failed:", insertError.message)
-      return NextResponse.json(
-        { error: "No se pudo guardar el análisis. Intenta de nuevo." },
-        { status: 500 }
-      )
-    }
-
+    // Importante: aquí NO se persiste nada. El análisis se devuelve al cliente
+    // para que el usuario lo revise y ajuste las categorías en el modal; el
+    // guardado real ocurre en POST /api/statements al confirmar. El crédito ya
+    // se consumió porque el costo es el procesamiento de IA, no el guardado.
     return NextResponse.json({
       success: true,
       metadata: {

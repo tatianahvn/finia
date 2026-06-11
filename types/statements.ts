@@ -28,6 +28,7 @@ export type Category =
   | "otros";
 
 export interface Transaction {
+  id?: string;             // uuid en la tabla `transactions`; ausente en datos crudos
   fecha: string;           // "YYYY-MM-DD"
   descripcion: string;
   comercio: string | null;

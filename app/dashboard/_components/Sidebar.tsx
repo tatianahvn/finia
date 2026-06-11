@@ -10,6 +10,7 @@ import {
   BarChart2,
   Lightbulb,
   UserCircle,
+  Rocket,
   Zap,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
@@ -49,7 +50,7 @@ export default function Sidebar() {
     <aside className="w-60 shrink-0 flex flex-col bg-white min-h-screen">
       <div className="px-6 py-5">
         <Link href="/" className="text-3xl font-bold tracking-tight text-violet-800">
-          finia
+          Finial
         </Link>
       </div>
 
@@ -74,17 +75,22 @@ export default function Sidebar() {
       </nav>
 
       <div className="px-4 pb-3">
-        <div className="rounded-xl bg-violet-700 p-4">
-          <div className="flex items-center gap-1.5 mb-1">
-            <Zap size={13} className="text-violet-200" />
+        <div className="flex flex-col justify-center min-h-50 rounded-xl bg-violet-700 p-4 bg-gradient-to-r from-violet-600 to-fuchsia-500">
+          <div className="flex justify-center">
+            <Rocket size={45} className="text-white" />
+          </div>
+
+          <div className="flex items-center gap-1.5 pt-5">
+            <Zap size={15} className="text-violet-200" />
             <p className="text-sm font-semibold text-white">Obtén más créditos</p>
           </div>
-          <p className="text-xs text-violet-200 leading-relaxed mb-3">
+
+          <p className="text-sm text-violet-200 leading-relaxed mb-3">
             Más análisis y funciones avanzadas para tus finanzas
           </p>
           <Link
             href="/upgrade"
-            className="block text-center text-xs font-semibold bg-white text-violet-700 rounded-lg py-1.5 hover:bg-violet-50 transition-colors"
+            className="block text-center text-sm font-semibold bg-white text-violet-700 rounded-lg py-1.5 hover:bg-violet-50 transition-colors"
           >
             Créditos →
           </Link>

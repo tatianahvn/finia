@@ -1,18 +1,17 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 import { useAnalysis } from '@/lib/context/analysis'
 import FileUpload from '../_components/FileUpload'
-import AnalysisHistory from '../_components/AnalysisHistory'
-import type { ParsedStatement } from '@/types/statements'
+import BankStatements from '../_components/BankStatements'
 
 export default function EstadosDeCuentaPage() {
-  const router = useRouter()
-  const { addStatement } = useAnalysis()
+  const { refresh } = useAnalysis()
+  const [reloadKey, setReloadKey] = useState(0)
 
-  function handleAnalysisComplete(data: ParsedStatement) {
-    addStatement(data)
-    router.push('/dashboard')
+  async function handleSaved() {
+    setReloadKey(k => k + 1)
+    await refresh()
   }
 
   return (
@@ -20,15 +19,15 @@ export default function EstadosDeCuentaPage() {
       <div className="shrink-0">
         <h1 className="text-2xl font-bold text-neutral-900">Estados de cuenta</h1>
         <p className="text-sm text-neutral-500 mt-1">
-          Sube nuevos estados de cuenta y administra los que ya analizaste. Cada análisis consume 1 crédito.
+          Sube nuevos estados de cuenta y administra los que ya cargaste. Cada archivo cargado consume 1 crédito.
         </p>
       </div>
 
       <div className="shrink-0">
-        <FileUpload onAnalysisComplete={handleAnalysisComplete} />
+        <FileUpload onSaved={handleSaved} />
       </div>
 
-      <AnalysisHistory />
+      <BankStatements reloadKey={reloadKey} />
     </div>
   )
 }

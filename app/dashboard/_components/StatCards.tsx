@@ -42,8 +42,8 @@ export default function StatCards({ resumen, count }: Props) {
   ]
 
   return (
-    <section>
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+    <section className="h-full">
+      <div className="grid grid-cols-2 gap-4 h-full">
         {stats.map(({ label, value, icon: Icon, badgeClass, iconClass }) => (
           <div key={label} className="bg-white rounded-2xl p-5 shadow-sm flex items-center gap-4">
             <div className="flex-1 flex flex-col gap-2">
