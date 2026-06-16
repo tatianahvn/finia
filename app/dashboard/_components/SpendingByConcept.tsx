@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Loader2 } from 'lucide-react'
+import { Loader2, ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react'
 import type { Category, Transaction } from '@/types/statements'
 import { getCategoryMeta } from '@/lib/categories'
 
@@ -19,6 +19,9 @@ interface ConceptRow {
   rawNames: string[]
 }
 
+type SortKey = 'name' | 'category' | 'count' | 'total'
+type SortDir = 'asc' | 'desc'
+
 function formatCurrency(amount: number): string {
   return amount.toLocaleString('es-MX', { style: 'currency', currency: 'MXN', minimumFractionDigits: 2 })
 }
@@ -31,7 +34,19 @@ function rawConceptName(tx: Transaction): string {
 export default function SpendingByConcept({ transactions }: Props) {
   const [mapping, setMapping] = useState<Record<string, string>>({})
   const [normalizing, setNormalizing] = useState(false)
+  const [sortKey, setSortKey] = useState<SortKey>('total')
+  const [sortDir, setSortDir] = useState<SortDir>('desc')
   const abortRef = useRef<AbortController | null>(null)
+
+  const toggleSort = (key: SortKey) => {
+    if (sortKey === key) {
+      setSortDir(d => (d === 'asc' ? 'desc' : 'asc'))
+    } else {
+      setSortKey(key)
+      // Texto: A→Z por defecto. Numérico: mayor→menor por defecto.
+      setSortDir(key === 'name' || key === 'category' ? 'asc' : 'desc')
+    }
+  }
 
   const rawConcepts = useMemo(() => {
     const seen = new Set<string>()
@@ -97,8 +112,30 @@ export default function SpendingByConcept({ transactions }: Props) {
         const category = [...categoryVotes.entries()].sort((a, b) => b[1] - a[1])[0][0] as Category
         return { name, total, count, category, rawNames: Array.from(rawNames) }
       })
-      .sort((a, b) => b.total - a.total)
   }, [transactions, mapping])
+
+  const sortedRows = useMemo<ConceptRow[]>(() => {
+    const arr = [...rows]
+    arr.sort((a, b) => {
+      let cmp = 0
+      switch (sortKey) {
+        case 'name':
+          cmp = a.name.localeCompare(b.name, 'es')
+          break
+        case 'category':
+          cmp = getCategoryMeta(a.category).label.localeCompare(getCategoryMeta(b.category).label, 'es')
+          break
+        case 'count':
+          cmp = a.count - b.count
+          break
+        case 'total':
+          cmp = a.total - b.total
+          break
+      }
+      return sortDir === 'asc' ? cmp : -cmp
+    })
+    return arr
+  }, [rows, sortKey, sortDir])
 
   return (
     <section className="bg-white rounded-2xl p-6 shadow-sm">
@@ -122,16 +159,24 @@ export default function SpendingByConcept({ transactions }: Props) {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-neutral-100 text-left text-xs text-neutral-400 uppercase tracking-wider">
+              <tr className="border-b border-neutral-100 text-left text-xs text-neutral-500 uppercase tracking-wider">
                 <th className="pb-3 pr-4 w-10">#</th>
-                <th className="pb-3 pr-4">Concepto</th>
-                <th className="pb-3 pr-4 w-40">Categoría</th>
-                <th className="pb-3 pr-4 text-center w-36">Transacciones</th>
-                <th className="pb-3 text-right w-50">Total</th>
+                <th className="pb-3 pr-4">
+                  <HeaderSort label="Concepto" sortKey="name" activeKey={sortKey} dir={sortDir} onSort={toggleSort} />
+                </th>
+                <th className="pb-3 pr-4 w-40">
+                  <HeaderSort label="Categoría" sortKey="category" activeKey={sortKey} dir={sortDir} onSort={toggleSort} />
+                </th>
+                <th className="pb-3 pr-4 w-36">
+                  <HeaderSort label="Transacciones" sortKey="count" activeKey={sortKey} dir={sortDir} onSort={toggleSort} align="center" />
+                </th>
+                <th className="pb-3 w-50">
+                  <HeaderSort label="Total" sortKey="total" activeKey={sortKey} dir={sortDir} onSort={toggleSort} align="right" />
+                </th>
               </tr>
             </thead>
             <tbody>
-              {rows.map(({ name, total, count, category, rawNames }, i) => {
+              {sortedRows.map(({ name, total, count, category, rawNames }, i) => {
                 const meta = getCategoryMeta(category)
                 return (
                   <tr
@@ -167,5 +212,39 @@ export default function SpendingByConcept({ transactions }: Props) {
         </div>
       )}
     </section>
+  )
+}
+
+interface HeaderSortProps {
+  label: string
+  sortKey: SortKey
+  activeKey: SortKey
+  dir: SortDir
+  onSort: (key: SortKey) => void
+  align?: 'left' | 'center' | 'right'
+}
+
+function HeaderSort({ label, sortKey, activeKey, dir, onSort, align = 'left' }: HeaderSortProps) {
+  const active = activeKey === sortKey
+  const justify = align === 'center' ? 'justify-center' : align === 'right' ? 'justify-end' : 'justify-start'
+
+  return (
+    <button
+      type="button"
+      onClick={() => onSort(sortKey)}
+      title={`Ordenar por ${label}`}
+      className={`group flex items-center gap-1 w-full ${justify} uppercase tracking-wider transition-colors hover:text-violet-700 ${active ? 'text-violet-700' : ''}`}
+    >
+      <span>{label}</span>
+      <span className={`p-0.5 rounded transition-colors ${active ? 'text-violet-700' : 'text-neutral-500 group-hover:text-violet-400'}`}>
+        {!active ? (
+          <ArrowUpDown size={15} />
+        ) : dir === 'asc' ? (
+          <ArrowUp size={15} />
+        ) : (
+          <ArrowDown size={15} />
+        )}
+      </span>
+    </button>
   )
 }

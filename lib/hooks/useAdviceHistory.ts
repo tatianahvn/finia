@@ -28,9 +28,11 @@ function load(): Record<string, AdviceEntry> {
 
 export function useAdviceHistory() {
   const [history, setHistory] = useState<Record<string, AdviceEntry>>({})
+  const [loaded, setLoaded] = useState(false)
 
   useEffect(() => {
     setHistory(load())
+    setLoaded(true)
   }, [])
 
   const save = useCallback((entry: AdviceEntry) => {
@@ -43,5 +45,5 @@ export function useAdviceHistory() {
 
   const entries = Object.values(history).sort((a, b) => b.mes.localeCompare(a.mes))
 
-  return { entries, save }
+  return { entries, save, loaded }
 }

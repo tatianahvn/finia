@@ -1,12 +1,12 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { ChevronLeft, ChevronRight, Sparkles, Download, Loader2 } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Download, Loader2 } from 'lucide-react'
 import { useAnalysis } from '@/lib/context/analysis'
 import { useAdviceHistory } from '@/lib/hooks/useAdviceHistory'
 import SpendingByCategory from '../_components/SpendingByCategory'
 import SpendingByConcept from '../_components/SpendingByConcept'
-import AdviceModal from '../_components/AdviceModal'
+import FinancialAdviceCard from '../_components/FinancialAdviceCard'
 import EmptyAnalysisCTA from '../_components/EmptyAnalysisCTA'
 
 function monthLabel(ym: string) {
@@ -19,7 +19,6 @@ export default function AnalisisPage() {
   const { statement, loading } = useAnalysis()
   const { entries: adviceEntries } = useAdviceHistory()
   const [selectedIndex, setSelectedIndex] = useState(0)
-  const [modalOpen, setModalOpen] = useState(false)
   const [downloading, setDownloading] = useState(false)
 
   const months = useMemo(() => {
@@ -68,11 +67,11 @@ export default function AnalisisPage() {
       <div className="flex flex-col gap-6 animate-pulse">
         <div className="h-8 w-40 rounded-xl bg-neutral-200" />
         <div className="h-12 rounded-xl bg-neutral-200" />
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_2fr]">
+        <div className="h-72 rounded-2xl bg-neutral-200" />
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           <div className="h-80 rounded-2xl bg-neutral-200" />
           <div className="h-80 rounded-2xl bg-neutral-200" />
         </div>
-        <div className="h-64 rounded-2xl bg-neutral-200" />
       </div>
     )
   }
@@ -160,36 +159,20 @@ export default function AnalisisPage() {
                 : <Download size={16} className="shrink-0" />}
               {downloading ? 'Generando…' : 'Descargar reporte'}
             </button>
-
-            <button
-              onClick={() => setModalOpen(true)}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm text-white
-                bg-gradient-to-r from-violet-600 to-fuchsia-500
-                hover:from-violet-700 hover:to-fuchsia-600
-                shadow-md hover:shadow-lg
-                transition-all active:scale-95"
-            >
-              <Sparkles size={16} className="shrink-0" />
-              Generar consejos financieros
-            </button>
           </div>
         </div>
 
-        {/* Category breakdown (filtered month) */}
-        <SpendingByCategory transactions={filtered} />
+        {/* Primera fila — gastos por categoría + CTA de consejos financieros */}
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          <div className="lg:col-span-2">
+            <SpendingByCategory transactions={filtered} />
+          </div>
+          <FinancialAdviceCard transactions={filtered} month={months[selectedIndex]} />
+        </div>
 
-        {/* Concept breakdown (filtered month) */}
+        {/* Segunda fila — gastos por concepto */}
         <SpendingByConcept transactions={filtered} />
       </div>
-
-      {months.length > 0 && (
-        <AdviceModal
-          open={modalOpen}
-          onClose={() => setModalOpen(false)}
-          transactions={filtered}
-          month={months[selectedIndex]}
-        />
-      )}
     </>
   )
 }
