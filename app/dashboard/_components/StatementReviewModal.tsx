@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { ChevronDown, FileCheck2, X, Building2, CalendarRange, FileText, Receipt } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { ChevronDown, FileCheck2, Building2, CalendarRange, FileText, Receipt } from 'lucide-react'
 import type { ParsedStatement, Transaction } from '@/types/statements'
 import { getCategoryMeta, registerCategories } from '@/lib/categories'
 import { useCategories } from '@/lib/context/categories'
@@ -19,7 +19,6 @@ interface Props {
   filename: string
   statement: ParsedStatement | null
   saving: boolean
-  onClose: () => void
   /** Devuelve el estado de cuenta con las categorías ajustadas por el usuario. */
   onSave: (data: ParsedStatement) => void
 }
@@ -40,10 +39,8 @@ export default function StatementReviewModal({
   filename,
   statement,
   saving,
-  onClose,
   onSave,
 }: Props) {
-  const overlayRef = useRef<HTMLDivElement>(null)
   const [transacciones, setTransacciones] = useState<Transaction[]>([])
   const { categories } = useCategories()
 
@@ -71,13 +68,6 @@ export default function StatementReviewModal({
     if (!bySlug.has('otros')) bySlug.set('otros', { slug: 'otros', label: 'Otros', emoji: '📦' })
     return Array.from(bySlug.values())
   }, [categories, statement])
-
-  useEffect(() => {
-    if (!open) return
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape' && !saving) onClose() }
-    document.addEventListener('keydown', onKey)
-    return () => document.removeEventListener('keydown', onKey)
-  }, [open, onClose, saving])
 
   const currency = statement?.resumen?.moneda ?? 'MXN'
   const banco = statement?.resumen?.banco?.trim() || '—'
@@ -107,9 +97,7 @@ export default function StatementReviewModal({
 
   return (
     <div
-      ref={overlayRef}
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
-      onClick={e => { if (e.target === overlayRef.current && !saving) onClose() }}
     >
       <div className="relative w-full max-w-3xl max-h-[90vh] bg-white rounded-3xl shadow-2xl flex flex-col">
         {/* Header */}
@@ -118,22 +106,14 @@ export default function StatementReviewModal({
             <div className="w-8 h-8 rounded-xl bg-violet-50 flex items-center justify-center">
               <FileCheck2 size={16} className="text-violet-700" />
             </div>
-            <p className="text-sm font-bold text-neutral-900">Revisar estado de cuenta</p>
+            <p className="text-xl font-bold text-neutral-900">Revisar estado de cuenta</p>
           </div>
-          <button
-            onClick={onClose}
-            disabled={saving}
-            className="p-1.5 rounded-lg text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 transition-colors disabled:opacity-50"
-          >
-            <X size={18} />
-          </button>
         </div>
 
         {/* Body */}
         <div className="flex-1 flex flex-col gap-4 px-6 py-5 min-h-0 overflow-hidden">
-          <p className="shrink-0 text-sm text-neutral-600 leading-relaxed">
-            Verifica que este sea el estado de cuenta que deseas guardar. Ajusta o
-            corrige las categorías que la IA asignó y guarda tus cambios para continuar.
+          <p className="shrink-0 text-md text-neutral-600 leading-relaxed">
+            Verifica las categorías asignadas de forma automática por la IA o elige una diferente de forma manual para ajustar.
           </p>
 
           {/* Banco y periodo — datos principales */}
@@ -227,18 +207,11 @@ export default function StatementReviewModal({
         {/* Footer */}
         <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-neutral-100 shrink-0">
           <button
-            onClick={onClose}
-            disabled={saving}
-            className="px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-100 rounded-xl transition-colors disabled:opacity-50"
-          >
-            Cancelar
-          </button>
-          <button
             onClick={handleSave}
             disabled={saving}
             className="px-4 py-2 text-sm font-semibold text-white bg-violet-800 hover:bg-violet-900 rounded-xl transition-colors disabled:opacity-50"
           >
-            {saving ? 'Guardando...' : 'Guardar cambios'}
+            {saving ? 'Guardando...' : 'Guardar'}
           </button>
         </div>
       </div>

@@ -4,6 +4,7 @@ import { useState, useRef } from 'react'
 import { UploadCloud, FlaskConical } from 'lucide-react'
 import FileItem from './FileItem'
 import StatementReviewModal from './StatementReviewModal'
+import StatementSavedModal from './StatementSavedModal'
 import { DUMMY_FILENAME, DUMMY_STATEMENT } from '@/lib/fixtures/dummyStatement'
 import type { ParsedStatement } from '@/types/statements'
 
@@ -27,6 +28,7 @@ export default function FileUpload({ onSaved }: Props) {
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [review, setReview] = useState<{ filename: string; data: ParsedStatement } | null>(null)
   const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
   const setSingleFile = (incoming: FileList | File[]) => {
@@ -109,6 +111,7 @@ export default function FileUpload({ onSaved }: Props) {
 
       setReview(null)
       removeFile()
+      setSaved(true)
       await onSaved()
     } catch (err) {
       setErrorMsg(err instanceof Error ? err.message : 'No se pudo guardar el estado de cuenta')
@@ -200,9 +203,10 @@ export default function FileUpload({ onSaved }: Props) {
         filename={review?.filename ?? ''}
         statement={review?.data ?? null}
         saving={saving}
-        onClose={() => { if (!saving) setReview(null) }}
         onSave={handleSave}
       />
+
+      <StatementSavedModal open={saved} onClose={() => setSaved(false)} />
     </section>
   )
 }
