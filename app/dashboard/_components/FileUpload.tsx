@@ -74,17 +74,17 @@ export default function FileUpload({ onSaved }: Props) {
       const parsed = results?.[0]
       if (!parsed?.text) throw new Error('No se pudo extraer texto del PDF')
 
-      const analyzeRes = await fetch('/api/statements/analyze', {
+      const categorizeRes = await fetch('/api/statements/categorize', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: parsed.text, filename: parsed.name }),
       })
-      if (!analyzeRes.ok) {
-        const { error } = await analyzeRes.json()
-        throw new Error(error ?? 'Error al analizar el estado de cuenta')
+      if (!categorizeRes.ok) {
+        const { error } = await categorizeRes.json()
+        throw new Error(error ?? 'Error al categorizar el estado de cuenta')
       }
 
-      const { data }: { data: ParsedStatement } = await analyzeRes.json()
+      const { data }: { data: ParsedStatement } = await categorizeRes.json()
       setReview({ filename: parsed.name, data })
       setStatus('idle')
     } catch (err) {
@@ -117,7 +117,7 @@ export default function FileUpload({ onSaved }: Props) {
     }
   }
 
-  // Abre el modal con datos de prueba, sin llamar a parse/analyze: cero créditos
+  // Abre el modal con datos de prueba, sin llamar a parse/categorize: cero créditos
   // y cero tokens de IA. Solo visible en desarrollo.
   const loadDummy = () => {
     setErrorMsg(null)

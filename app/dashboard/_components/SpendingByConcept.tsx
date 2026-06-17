@@ -1,8 +1,8 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { Loader2, ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react'
-import type { Category, Transaction } from '@/types/statements'
+import { useMemo, useState } from 'react'
+import { ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react'
+import type { Transaction } from '@/types/statements'
 import { getCategoryMeta } from '@/lib/categories'
 
 const CARGO_TYPES = new Set(['cargo', 'transferencia_enviada', 'retiro', 'comision'])
@@ -15,7 +15,7 @@ interface ConceptRow {
   name: string
   total: number
   count: number
-  category: Category
+  category: string
   rawNames: string[]
 }
 
@@ -32,11 +32,8 @@ function rawConceptName(tx: Transaction): string {
 }
 
 export default function SpendingByConcept({ transactions }: Props) {
-  const [mapping, setMapping] = useState<Record<string, string>>({})
-  const [normalizing, setNormalizing] = useState(false)
   const [sortKey, setSortKey] = useState<SortKey>('total')
   const [sortDir, setSortDir] = useState<SortDir>('desc')
-  const abortRef = useRef<AbortController | null>(null)
 
   const toggleSort = (key: SortKey) => {
     if (sortKey === key) {
@@ -47,40 +44,6 @@ export default function SpendingByConcept({ transactions }: Props) {
       setSortDir(key === 'name' || key === 'category' ? 'asc' : 'desc')
     }
   }
-
-  const rawConcepts = useMemo(() => {
-    const seen = new Set<string>()
-    for (const tx of transactions) {
-      if (CARGO_TYPES.has(tx.tipo)) seen.add(rawConceptName(tx))
-    }
-    return Array.from(seen)
-  }, [transactions])
-
-  useEffect(() => {
-    if (rawConcepts.length === 0) {
-      setMapping({})
-      return
-    }
-
-    abortRef.current?.abort()
-    const controller = new AbortController()
-    abortRef.current = controller
-
-    setNormalizing(true)
-
-    fetch('/api/statements/normalize-concepts', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ concepts: rawConcepts }),
-      signal: controller.signal,
-    })
-      .then(res => res.json())
-      .then(data => { if (data.mapping) setMapping(data.mapping) })
-      .catch(err => { if (err.name !== 'AbortError') console.error('[normalize-concepts]', err) })
-      .finally(() => setNormalizing(false))
-
-    return () => controller.abort()
-  }, [rawConcepts])
 
   const rows = useMemo<ConceptRow[]>(() => {
     const groups = new Map<string, {
@@ -93,7 +56,9 @@ export default function SpendingByConcept({ transactions }: Props) {
     for (const tx of transactions) {
       if (!CARGO_TYPES.has(tx.tipo)) continue
       const raw = rawConceptName(tx)
-      const normalized = mapping[raw] ?? raw
+      // Concepto normalizado por la IA al guardar el estado de cuenta. Si no
+      // existe (datos previos a la migración), se agrupa por el nombre crudo.
+      const normalized = tx.concepto_normalizado?.trim() || raw
       const prev = groups.get(normalized) ?? {
         total: 0,
         count: 0,
@@ -109,10 +74,10 @@ export default function SpendingByConcept({ transactions }: Props) {
 
     return [...groups.entries()]
       .map(([name, { total, count, categoryVotes, rawNames }]) => {
-        const category = [...categoryVotes.entries()].sort((a, b) => b[1] - a[1])[0][0] as Category
+        const category = [...categoryVotes.entries()].sort((a, b) => b[1] - a[1])[0][0] as string
         return { name, total, count, category, rawNames: Array.from(rawNames) }
       })
-  }, [transactions, mapping])
+  }, [transactions])
 
   const sortedRows = useMemo<ConceptRow[]>(() => {
     const arr = [...rows]
@@ -143,12 +108,6 @@ export default function SpendingByConcept({ transactions }: Props) {
         <h2 className="text-sm font-bold tracking-widest text-violet-700 uppercase">
           Gasto por concepto
         </h2>
-        {normalizing && (
-          <span className="flex items-center gap-1.5 text-xs text-neutral-400">
-            <Loader2 size={13} className="animate-spin" />
-            Normalizando...
-          </span>
-        )}
       </div>
 
       {rows.length === 0 ? (

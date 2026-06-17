@@ -1,15 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
-import type { Category } from "@/types/statements"
-
-const VALID_CATEGORIES: Category[] = [
-  "alimentacion", "transporte", "entretenimiento", "salud", "educacion",
-  "servicios", "vestimenta", "hogar", "viajes", "nomina", "transferencia",
-  "inversiones", "impuestos", "seguros", "comisiones", "otros",
-]
 
 interface PatchBody {
-  categoria: Category
+  categoria: string
 }
 
 export async function PATCH(
@@ -28,7 +21,7 @@ export async function PATCH(
     return NextResponse.json({ error: "Body inválido" }, { status: 400 })
   }
 
-  if (!VALID_CATEGORIES.includes(body.categoria)) {
+  if (!body.categoria || typeof body.categoria !== "string") {
     return NextResponse.json({ error: "Categoría inválida" }, { status: 400 })
   }
 
@@ -36,6 +29,19 @@ export async function PATCH(
   const { data: { user }, error: authError } = await supabase.auth.getUser()
   if (authError || !user) {
     return NextResponse.json({ error: "No autenticado" }, { status: 401 })
+  }
+
+  // La categoría debe existir en la taxonomía del usuario (defaults + creadas
+  // por la IA). Evita guardar slugs arbitrarios.
+  const { data: cat } = await supabase
+    .from("categories")
+    .select("slug")
+    .eq("user_id", user.id)
+    .eq("slug", body.categoria)
+    .maybeSingle()
+
+  if (!cat) {
+    return NextResponse.json({ error: "Categoría inválida" }, { status: 400 })
   }
 
   const { error, count } = await supabase

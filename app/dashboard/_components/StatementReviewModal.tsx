@@ -2,16 +2,17 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { ChevronDown, FileCheck2, X, Building2, CalendarRange, FileText, Receipt } from 'lucide-react'
-import type { Category, ParsedStatement, Transaction } from '@/types/statements'
-import { CATEGORIES, getCategoryMeta } from '@/lib/categories'
-
-const CATEGORY_OPTIONS: Category[] = [
-  'alimentacion', 'transporte', 'entretenimiento', 'salud', 'educacion',
-  'servicios', 'vestimenta', 'hogar', 'viajes', 'nomina', 'transferencia',
-  'inversiones', 'impuestos', 'seguros', 'comisiones', 'otros',
-]
+import type { ParsedStatement, Transaction } from '@/types/statements'
+import { getCategoryMeta, registerCategories } from '@/lib/categories'
+import { useCategories } from '@/lib/context/categories'
 
 const CARGO_TYPES = new Set(['cargo', 'transferencia_enviada', 'retiro', 'comision'])
+
+interface CategoryOption {
+  slug: string
+  label: string
+  emoji?: string
+}
 
 interface Props {
   open: boolean
@@ -44,11 +45,32 @@ export default function StatementReviewModal({
 }: Props) {
   const overlayRef = useRef<HTMLDivElement>(null)
   const [transacciones, setTransacciones] = useState<Transaction[]>([])
+  const { categories } = useCategories()
 
   // Cada vez que se abre con un nuevo análisis, reinicia el borrador editable.
   useEffect(() => {
     setTransacciones(statement?.transacciones ?? [])
   }, [statement])
+
+  // Registra las categorías nuevas que la IA propuso (aún no persistidas) para
+  // que sus badges se rendericen con label/emoji/color correctos en el modal.
+  useEffect(() => {
+    if (statement?.nuevas_categorias?.length) {
+      registerCategories(statement.nuevas_categorias.map(c => ({ ...c, origin: 'ai' as const })))
+    }
+  }, [statement])
+
+  // Opciones del dropdown: taxonomía del usuario (BD) + las categorías nuevas
+  // propuestas por la IA en este documento (aún no guardadas), sin duplicar slugs.
+  const categoryOptions = useMemo<CategoryOption[]>(() => {
+    const bySlug = new Map<string, CategoryOption>()
+    for (const c of categories) bySlug.set(c.slug, { slug: c.slug, label: c.label, emoji: c.emoji })
+    for (const c of statement?.nuevas_categorias ?? []) {
+      if (!bySlug.has(c.slug)) bySlug.set(c.slug, { slug: c.slug, label: c.label, emoji: c.emoji })
+    }
+    if (!bySlug.has('otros')) bySlug.set('otros', { slug: 'otros', label: 'Otros', emoji: '📦' })
+    return Array.from(bySlug.values())
+  }, [categories, statement])
 
   useEffect(() => {
     if (!open) return
@@ -73,7 +95,7 @@ export default function StatementReviewModal({
 
   if (!open || !statement) return null
 
-  const changeCategory = (index: number, categoria: Category) => {
+  const changeCategory = (index: number, categoria: string) => {
     setTransacciones(prev =>
       prev.map((tx, i) => (i === index ? { ...tx, categoria, confianza: 1 } : tx))
     )
@@ -172,14 +194,14 @@ export default function StatementReviewModal({
                         className={`group relative inline-flex items-center rounded-full w-fit ring-1 ring-inset ring-black/10 transition hover:ring-2 hover:ring-black/25 hover:shadow-sm cursor-pointer ${meta.badgeClasses}`}
                       >
                         <select
-                          value={CATEGORY_OPTIONS.includes(tx.categoria) ? tx.categoria : 'otros'}
+                          value={categoryOptions.some(o => o.slug === tx.categoria) ? tx.categoria : 'otros'}
                           disabled={saving}
-                          onChange={e => changeCategory(index, e.target.value as Category)}
+                          onChange={e => changeCategory(index, e.target.value)}
                           className="appearance-none bg-transparent text-xs font-medium pl-2.5 pr-7 py-1 rounded-full focus:outline-none focus:ring-2 focus:ring-black/30 cursor-pointer disabled:cursor-not-allowed"
                         >
-                          {CATEGORY_OPTIONS.map(opt => (
-                            <option key={opt} value={opt} className="bg-white text-neutral-900">
-                              {CATEGORIES[opt]?.emoji} {CATEGORIES[opt]?.label ?? opt}
+                          {categoryOptions.map(opt => (
+                            <option key={opt.slug} value={opt.slug} className="bg-white text-neutral-900">
+                              {opt.emoji} {opt.label}
                             </option>
                           ))}
                         </select>

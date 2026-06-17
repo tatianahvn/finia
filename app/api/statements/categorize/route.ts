@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
-import { analyzeStatementText } from "@/lib/services/groq"
+import { categorizeStatementText, type CategoryForPrompt } from "@/lib/services/groq"
 import { createClient } from "@/lib/supabase/server"
 
-interface AnalyzeRequestBody {
+interface CategorizeRequestBody {
   text: string
   filename?: string
 }
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  let body: AnalyzeRequestBody
+  let body: CategorizeRequestBody
   try {
     body = await request.json()
   } catch {
@@ -57,24 +57,43 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  try {
-    const data = await analyzeStatementText(text)
+  // Asegura que el usuario tenga las categorías por defecto (siembra perezosa
+  // para usuarios que se registraron antes de la migración) y lee su taxonomía
+  // —defaults + las que la IA descubrió en corridas previas— para alimentar el
+  // prompt. Si falla la lectura, se continúa con una lista vacía (el LLM podrá
+  // proponer categorías nuevas igualmente).
+  await supabase.rpc("seed_default_categories", { p_user_id: user.id })
 
-    // Importante: aquí NO se persiste nada. El análisis se devuelve al cliente
-    // para que el usuario lo revise y ajuste las categorías en el modal; el
-    // guardado real ocurre en POST /api/statements al confirmar. El crédito ya
-    // se consumió porque el costo es el procesamiento de IA, no el guardado.
+  const { data: catRows } = await supabase
+    .from("categories")
+    .select("slug, label, description, examples")
+    .eq("user_id", user.id)
+
+  const categories: CategoryForPrompt[] = (catRows ?? []).map(c => ({
+    slug: c.slug,
+    label: c.label,
+    description: c.description,
+    examples: Array.isArray(c.examples) ? (c.examples as string[]) : [],
+  }))
+
+  try {
+    const data = await categorizeStatementText(text, categories)
+
+    // Importante: aquí NO se persiste nada. La categorización se devuelve al
+    // cliente para que el usuario la revise y ajuste las categorías en el modal;
+    // el guardado real ocurre en POST /api/statements al confirmar. El crédito
+    // ya se consumió porque el costo es el procesamiento de IA, no el guardado.
     return NextResponse.json({
       success: true,
       metadata: {
         filename: filename ?? "sin_nombre",
-        caracteres_analizados: text.length,
+        caracteres_procesados: text.length,
         transacciones_encontradas: data.transacciones.length,
       },
       data,
     })
   } catch (error: unknown) {
-    console.error("[analyze] error:", error)
+    console.error("[categorize] error:", error)
     if (error instanceof Error && error.message.includes("429")) {
       return NextResponse.json(
         { error: "Límite de Groq alcanzado. Intenta en unos minutos." },

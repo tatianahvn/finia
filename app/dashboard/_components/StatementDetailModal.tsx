@@ -2,14 +2,9 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { ChevronDown, Eye, Pencil, X, Building2, CalendarRange, FileText, Receipt } from 'lucide-react'
-import type { Category, StatementSummary, Transaction } from '@/types/statements'
-import { CATEGORIES, getCategoryMeta } from '@/lib/categories'
-
-const CATEGORY_OPTIONS: Category[] = [
-  'alimentacion', 'transporte', 'entretenimiento', 'salud', 'educacion',
-  'servicios', 'vestimenta', 'hogar', 'viajes', 'nomina', 'transferencia',
-  'inversiones', 'impuestos', 'seguros', 'comisiones', 'otros',
-]
+import type { StatementSummary, Transaction } from '@/types/statements'
+import { getCategoryMeta } from '@/lib/categories'
+import { useCategories } from '@/lib/context/categories'
 
 const CARGO_TYPES = new Set(['cargo', 'transferencia_enviada', 'retiro', 'comision'])
 
@@ -51,8 +46,16 @@ export default function StatementDetailModal({
   const overlayRef = useRef<HTMLDivElement>(null)
   const [draft, setDraft] = useState<Transaction[]>([])
   const [error, setError] = useState<string | null>(null)
+  const { categories } = useCategories()
 
   const isEdit = mode === 'edit'
+
+  // Opciones del dropdown desde la taxonomía del usuario (BD), con "Otros" garantizado.
+  const categoryOptions = useMemo(() => {
+    const opts = categories.map(c => ({ slug: c.slug, label: c.label, emoji: c.emoji }))
+    if (!opts.some(o => o.slug === 'otros')) opts.push({ slug: 'otros', label: 'Otros', emoji: '📦' })
+    return opts
+  }, [categories])
 
   // Reinicia el borrador editable cada vez que llegan transacciones nuevas.
   useEffect(() => {
@@ -86,7 +89,7 @@ export default function StatementDetailModal({
     [draft, transactions]
   )
 
-  const changeCategory = (index: number, categoria: Category) => {
+  const changeCategory = (index: number, categoria: string) => {
     setDraft(prev => prev.map((tx, i) => (i === index ? { ...tx, categoria } : tx)))
   }
 
@@ -204,14 +207,14 @@ export default function StatementDetailModal({
                           className={`group relative inline-flex items-center rounded-full w-fit ring-1 ring-inset ring-black/10 transition hover:ring-2 hover:ring-black/25 hover:shadow-sm ${meta.badgeClasses} ${saving ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                         >
                           <select
-                            value={CATEGORY_OPTIONS.includes(tx.categoria) ? tx.categoria : 'otros'}
+                            value={categoryOptions.some(o => o.slug === tx.categoria) ? tx.categoria : 'otros'}
                             disabled={saving}
-                            onChange={e => changeCategory(index, e.target.value as Category)}
+                            onChange={e => changeCategory(index, e.target.value)}
                             className="appearance-none bg-transparent text-xs font-medium pl-2.5 pr-7 py-1 rounded-full focus:outline-none focus:ring-2 focus:ring-black/30 cursor-pointer disabled:cursor-not-allowed"
                           >
-                            {CATEGORY_OPTIONS.map(opt => (
-                              <option key={opt} value={opt} className="bg-white text-neutral-900">
-                                {CATEGORIES[opt]?.emoji} {CATEGORIES[opt]?.label ?? opt}
+                            {categoryOptions.map(opt => (
+                              <option key={opt.slug} value={opt.slug} className="bg-white text-neutral-900">
+                                {opt.emoji} {opt.label}
                               </option>
                             ))}
                           </select>

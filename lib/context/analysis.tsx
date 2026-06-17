@@ -2,12 +2,12 @@
 
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import type { Category, ParsedStatement, StatementSummary, Transaction } from '@/types/statements'
+import type { ParsedStatement, StatementSummary, Transaction } from '@/types/statements'
 
 interface AnalysisContextValue {
   statement: ParsedStatement | null
   setStatement: (s: ParsedStatement | null) => void
-  updateTransactionCategory: (id: string, categoria: Category) => void
+  updateTransactionCategory: (id: string, categoria: string) => void
   refresh: () => Promise<void>
   loading: boolean
 }
@@ -45,7 +45,7 @@ export function AnalysisProvider({ children }: { children: ReactNode }) {
     // Vista unificada de transacciones (cross-banco, cross-archivo) con ids reales.
     const { data: txs } = await supabase
       .from('transactions')
-      .select('id, fecha, descripcion, comercio, monto, tipo, categoria, confianza')
+      .select('id, statement_id, fecha, descripcion, comercio, monto, tipo, categoria, confianza, concepto_normalizado')
       .eq('user_id', user.id)
       .order('fecha', { ascending: true })
 
@@ -64,7 +64,7 @@ export function AnalysisProvider({ children }: { children: ReactNode }) {
     run()
   }, [refresh])
 
-  const updateTransactionCategory = useCallback((id: string, categoria: Category) => {
+  const updateTransactionCategory = useCallback((id: string, categoria: string) => {
     setStatement(prev => {
       if (!prev) return prev
       return {

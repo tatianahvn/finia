@@ -64,7 +64,12 @@ export default function FinancialAdviceCard({ transactions, month }: Props) {
   const [status, setStatus] = useState<Status>('loading')
   const [error, setError] = useState<string | null>(null)
   const [open, setOpen] = useState(false)
-  const inFlight = useRef<string | null>(null)
+  // Candado de concurrencia: evita dos peticiones simultáneas.
+  const inFlight = useRef(false)
+  // Meses para los que ya se disparó la generación automática. NO se limpia al
+  // terminar: garantiza "una sola vez por mes" aunque el efecto se re-ejecute
+  // por cambios de identidad de `payload`/`runGenerate` o por StrictMode.
+  const attempted = useRef<Set<string>>(new Set())
 
   const cached = useMemo(
     () => entries.find(e => e.mes === month) ?? null,
@@ -74,7 +79,16 @@ export default function FinancialAdviceCard({ transactions, month }: Props) {
   const payload = useMemo(() => buildPayload(transactions), [transactions])
   const hasGastos = payload.totalGastos > 0
 
+  // Estado de cuenta a asociar: el de la transacción más reciente del mes.
+  const statementId = useMemo(() => {
+    const withStatement = transactions.filter(tx => tx.statement_id)
+    if (withStatement.length === 0) return null
+    return [...withStatement].sort((a, b) => b.fecha.localeCompare(a.fecha))[0].statement_id ?? null
+  }, [transactions])
+
   const runGenerate = useCallback(async () => {
+    if (inFlight.current) return
+    inFlight.current = true
     setStatus('loading')
     setError(null)
     try {
@@ -86,6 +100,7 @@ export default function FinancialAdviceCard({ transactions, month }: Props) {
       const json = await res.json()
       if (!res.ok) throw new Error(json.error ?? 'No se pudieron generar los consejos')
       const entry: AdviceEntry = {
+        statement_id: statementId,
         mes: month,
         generado: new Date().toISOString(),
         resumen: json.resumen,
@@ -96,22 +111,23 @@ export default function FinancialAdviceCard({ transactions, month }: Props) {
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error desconocido')
       setStatus('error')
+    } finally {
+      inFlight.current = false
     }
-  }, [payload, month, save])
+  }, [payload, month, statementId, save])
 
   // Generación automática en segundo plano: una sola vez por mes y solo si no
   // existe el consejo en caché. Así el usuario no depende de ninguna acción.
   useEffect(() => {
     if (!loaded || !month || !hasGastos || cached) return
-    if (inFlight.current === month) return
-    inFlight.current = month
-    runGenerate().finally(() => { inFlight.current = null })
+    if (attempted.current.has(month)) return
+    attempted.current.add(month)
+    runGenerate()
   }, [loaded, month, hasGastos, cached, runGenerate])
 
   const regenerate = () => {
     if (!hasGastos || status === 'loading') return
-    inFlight.current = month
-    runGenerate().finally(() => { inFlight.current = null })
+    runGenerate()
   }
 
   const generating = status === 'loading' && !cached

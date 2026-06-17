@@ -5,8 +5,32 @@ const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY
 })
 
-const SYSTEM_PROMPT = `Eres un analizador experto de estados de cuenta bancarios mexicanos.
-Extrae TODAS las transacciones del texto y responde ÚNICAMENTE con un JSON válido.
+// Categoría tal como se le presenta al LLM en el prompt: el slug que debe usar,
+// su etiqueta legible, una descripción de qué pertenece y ejemplos (few-shot).
+export interface CategoryForPrompt {
+  slug: string
+  label: string
+  description?: string | null
+  examples?: string[]
+}
+
+// Construye el prompt de categorización a partir de la taxonomía del usuario
+// (defaults + categorías que la IA ya descubrió en corridas previas). Los
+// ejemplos por categoría son el few-shot que mejora la precisión.
+function buildCategorizationPrompt(categories: CategoryForPrompt[]): string {
+  const catalogo = categories
+    .map(c => {
+      const ejemplos = c.examples?.length ? ` Ejemplos: ${c.examples.join(", ")}.` : ""
+      const desc = c.description ? ` ${c.description}` : ""
+      return `- "${c.slug}" (${c.label}):${desc}${ejemplos}`
+    })
+    .join("\n")
+
+  return `Eres un experto en lectura y categorización de estados de cuenta bancarios mexicanos.
+Extrae TODAS las transacciones del texto, asigna a cada una la categoría que mejor describa el gasto/ingreso, y responde ÚNICAMENTE con un JSON válido.
+
+Categorías disponibles (usa el "slug" exacto en el campo "categoria"):
+${catalogo}
 
 El JSON debe tener exactamente esta estructura:
 {
@@ -29,18 +53,24 @@ El JSON debe tener exactamente esta estructura:
       "comercio": string | null,
       "monto": number,
       "tipo": "cargo" | "abono" | "transferencia_enviada" | "transferencia_recibida" | "retiro" | "deposito" | "comision" | "interes" | "desconocido",
-      "categoria": "alimentacion" | "transporte" | "entretenimiento" | "salud" | "educacion" | "servicios" | "ropa_calzado" | "hogar" | "viajes" | "nomina_ingreso" | "transferencia" | "inversiones" | "impuestos" | "seguros" | "comisiones_bancarias" | "otros",
+      "categoria": string,
       "confianza": number
     }
   ],
-  "advertencias": string[]
+  "advertencias": string[],
+  "nuevas_categorias": [
+    { "slug": string, "label": string, "emoji": string, "description": string, "examples": string[] }
+  ]
 }
 
 Reglas:
 - Montos siempre positivos; usa el campo "tipo" para indicar si es cargo o abono.
-- "confianza" entre 0 y 1 según qué tan seguro estás de la categoría.
-- OXXO, WALMART, SORIANA → "alimentacion". UBER, DIDI, PEMEX → "transporte". NETFLIX, SPOTIFY, CINEPOLIS → "entretenimiento".
-- No incluyas texto fuera del JSON.`;
+- "confianza" entre 0 y 1 según qué tan seguro estás de la categoría asignada.
+- Asigna SIEMPRE la categoría existente que mejor encaje. Identifica el comercio real detrás del texto (ej. "COMPRA TARJETA 4512 SPOTIFY" → Spotify → "entretenimiento").
+- Solo si NINGUNA categoría existente encaja razonablemente, crea UNA nueva: agrégala a "nuevas_categorias" (slug en snake_case, sin acentos ni espacios; label legible; emoji; description breve; 3-6 examples) y usa ese mismo slug en la transacción. No abuses: reutiliza las existentes siempre que puedas.
+- Si no hay categorías nuevas, devuelve "nuevas_categorias": [].
+- No incluyas texto fuera del JSON.`
+}
 
 const OCR_PROMPT = `Eres un OCR especializado en estados de cuenta bancarios mexicanos.
 Extrae TODO el texto visible de la imagen tal cual aparece, preservando el orden de lectura y la estructura tabular cuando aplique.
@@ -122,8 +152,9 @@ export async function normalizeConceptNames(
   return parsed.mapping ?? {}
 }
 
-export async function analyzeStatementText(
-  pdfText: string
+export async function categorizeStatementText(
+  pdfText: string,
+  categories: CategoryForPrompt[]
 ): Promise<ParsedStatement> {
   const truncated = pdfText.slice(0, 80_000)
 
@@ -132,10 +163,10 @@ export async function analyzeStatementText(
     temperature: 0.1,
     max_tokens: 4000,
     messages: [
-      { role: "system", content: SYSTEM_PROMPT },
+      { role: "system", content: buildCategorizationPrompt(categories) },
       {
         role: "user",
-        content: `Analiza este estado de cuenta:\n\n${truncated}`,
+        content: `Categoriza las transacciones de este estado de cuenta:\n\n${truncated}`,
       },
     ],
     response_format: { type: "json_object" }
