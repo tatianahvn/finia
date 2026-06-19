@@ -92,20 +92,19 @@ export default function ConsejosPage() {
           <div>
             <p className="text-base font-semibold text-neutral-900">Sin consejos generados aún</p>
             <p className="text-sm text-neutral-400 mt-1 max-w-xs">
-              Ve a Análisis, selecciona un mes y presiona{' '}
-              <span className="font-medium text-violet-600">Generar consejos financieros</span>{' '}
-              para obtener recomendaciones personalizadas.
+              Carga un estado de cuenta y, al guardarlo, generaremos
+              automáticamente tus consejos financieros personalizados.
             </p>
           </div>
           <Link
-            href="/dashboard/analisis"
+            href="/dashboard/estados-de-cuenta"
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm text-white
               bg-gradient-to-r from-violet-600 to-fuchsia-500
               hover:from-violet-700 hover:to-fuchsia-600
               shadow-md transition-all"
           >
             <Sparkles size={15} />
-            Ir a Análisis
+            Cargar estado de cuenta
           </Link>
         </div>
       </div>

@@ -6,6 +6,7 @@ import FileItem from './FileItem'
 import StatementReviewModal from './StatementReviewModal'
 import StatementSavedModal from './StatementSavedModal'
 import { DUMMY_FILENAME, DUMMY_STATEMENT } from '@/lib/fixtures/dummyStatement'
+import { generateMonthlyAdvice, monthsOf } from '@/lib/services/advice'
 import type { ParsedStatement } from '@/types/statements'
 
 type ParsedResult = {
@@ -108,6 +109,22 @@ export default function FileUpload({ onSaved }: Props) {
         const { error } = await res.json()
         throw new Error(error ?? 'No se pudo guardar el estado de cuenta')
       }
+
+      const { id: statementId }: { id: string } = await res.json()
+
+      // Genera los consejos financieros automáticamente para cada mes del estado
+      // de cuenta recién guardado. Best-effort: un fallo aquí no impide el éxito
+      // del guardado (el usuario podrá generarlos manualmente desde Análisis).
+      const tx = edited.transacciones
+      await Promise.all(
+        monthsOf(tx).map(month =>
+          generateMonthlyAdvice({
+            transactions: tx.filter(t => t.fecha.startsWith(month)),
+            month,
+            statementId,
+          }).catch(err => console.error('[advice] auto-generación falló:', err))
+        )
+      )
 
       setReview(null)
       removeFile()

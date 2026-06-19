@@ -1,49 +1,11 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { ChartNoAxesCombined, Sparkles, ArrowRight, X, RefreshCw } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { ChartNoAxesCombined, Sparkles, ArrowRight, X, Loader2, AlertTriangle } from 'lucide-react'
 import type { Transaction } from '@/types/statements'
-import { useAdviceHistory, type AdviceEntry } from '@/lib/hooks/useAdviceHistory'
-
-const CARGO_TYPES = new Set(['cargo', 'transferencia_enviada', 'retiro', 'comision'])
-
-const LABEL: Record<string, string> = {
-  alimentacion:         'Alimentación',
-  transporte:           'Transporte',
-  entretenimiento:      'Ocio y entretenimiento',
-  salud:                'Salud',
-  educacion:            'Educación',
-  servicios:            'Servicios digitales',
-  vestimenta:           'Moda y ropa',
-  ropa_calzado:         'Moda y ropa',
-  hogar:                'Hogar',
-  viajes:               'Viajes',
-  nomina:               'Nómina',
-  transferencia:        'Transferencias',
-  inversiones:          'Ahorro e inversión',
-  impuestos:            'Impuestos',
-  seguros:              'Seguros',
-  comisiones:           'Comisiones',
-  comisiones_bancarias: 'Comisiones bancarias',
-  otros:                'Otros',
-}
-
-function buildPayload(transactions: Transaction[]) {
-  const totals = new Map<string, number>()
-  for (const tx of transactions) {
-    if (!CARGO_TYPES.has(tx.tipo)) continue
-    totals.set(tx.categoria, (totals.get(tx.categoria) ?? 0) + tx.monto)
-  }
-  const totalGastos = [...totals.values()].reduce((a, b) => a + b, 0)
-  const categorias = [...totals.entries()]
-    .sort((a, b) => b[1] - a[1])
-    .map(([cat, total]) => ({
-      label: LABEL[cat] ?? cat,
-      total,
-      porcentaje: totalGastos > 0 ? (total / totalGastos) * 100 : 0,
-    }))
-  return { categorias, totalGastos }
-}
+import type { AdviceEntry } from '@/lib/hooks/useAdviceHistory'
+import { hasExpenses } from '@/lib/services/advice'
+import { useMonthlyAdvice, type MonthlyAdviceStatus } from '@/lib/hooks/useMonthlyAdvice'
 
 function monthLabel(ym: string) {
   if (!ym) return ''
@@ -57,80 +19,16 @@ interface Props {
   month: string  // "YYYY-MM"
 }
 
-type Status = 'loading' | 'ready' | 'error'
-
+// Tarjeta de SOLO LECTURA. No genera consejos: solo consulta a la BD los del mes
+// en visualización (con caché en memoria). La generación ocurre exclusivamente al
+// guardar el estado de cuenta con las categorías refinadas por el usuario.
 export default function FinancialAdviceCard({ transactions, month }: Props) {
-  const { entries, save, loaded } = useAdviceHistory()
-  const [status, setStatus] = useState<Status>('loading')
-  const [error, setError] = useState<string | null>(null)
   const [open, setOpen] = useState(false)
-  // Candado de concurrencia: evita dos peticiones simultáneas.
-  const inFlight = useRef(false)
-  // Meses para los que ya se disparó la generación automática. NO se limpia al
-  // terminar: garantiza "una sola vez por mes" aunque el efecto se re-ejecute
-  // por cambios de identidad de `payload`/`runGenerate` o por StrictMode.
-  const attempted = useRef<Set<string>>(new Set())
 
-  const cached = useMemo(
-    () => entries.find(e => e.mes === month) ?? null,
-    [entries, month]
-  )
+  const hasGastos = hasExpenses(transactions)
+  const { entry, status } = useMonthlyAdvice(month, hasGastos)
 
-  const payload = useMemo(() => buildPayload(transactions), [transactions])
-  const hasGastos = payload.totalGastos > 0
-
-  // Estado de cuenta a asociar: el de la transacción más reciente del mes.
-  const statementId = useMemo(() => {
-    const withStatement = transactions.filter(tx => tx.statement_id)
-    if (withStatement.length === 0) return null
-    return [...withStatement].sort((a, b) => b.fecha.localeCompare(a.fecha))[0].statement_id ?? null
-  }, [transactions])
-
-  const runGenerate = useCallback(async () => {
-    if (inFlight.current) return
-    inFlight.current = true
-    setStatus('loading')
-    setError(null)
-    try {
-      const res = await fetch('/api/statements/advice', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      })
-      const json = await res.json()
-      if (!res.ok) throw new Error(json.error ?? 'No se pudieron generar los consejos')
-      const entry: AdviceEntry = {
-        statement_id: statementId,
-        mes: month,
-        generado: new Date().toISOString(),
-        resumen: json.resumen,
-        consejos: json.consejos,
-      }
-      save(entry)
-      setStatus('ready')
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error desconocido')
-      setStatus('error')
-    } finally {
-      inFlight.current = false
-    }
-  }, [payload, month, statementId, save])
-
-  // Generación automática en segundo plano: una sola vez por mes y solo si no
-  // existe el consejo en caché. Así el usuario no depende de ninguna acción.
-  useEffect(() => {
-    if (!loaded || !month || !hasGastos || cached) return
-    if (attempted.current.has(month)) return
-    attempted.current.add(month)
-    runGenerate()
-  }, [loaded, month, hasGastos, cached, runGenerate])
-
-  const regenerate = () => {
-    if (!hasGastos || status === 'loading') return
-    runGenerate()
-  }
-
-  const generating = status === 'loading' && !cached
+  const loading = status === 'loading'
 
   return (
     <section className="rounded-2xl p-6 shadow-sm flex flex-col items-center justify-center text-center h-full bg-violet-600 text-white">
@@ -151,10 +49,10 @@ export default function FinancialAdviceCard({ transactions, month }: Props) {
           bg-white text-violet-700 hover:bg-violet-50 transition-colors
           disabled:opacity-60 disabled:cursor-not-allowed"
       >
-        {generating ? (
+        {loading ? (
           <>
-            <RefreshCw size={16} className="animate-spin" />
-            Generando consejos…
+            <Loader2 size={16} className="animate-spin" />
+            Consultando consejos…
           </>
         ) : (
           <>
@@ -174,10 +72,8 @@ export default function FinancialAdviceCard({ transactions, month }: Props) {
         open={open}
         onClose={() => setOpen(false)}
         month={month}
-        entry={cached}
+        entry={entry}
         status={status}
-        error={error}
-        onRegenerate={regenerate}
       />
     </section>
   )
@@ -188,12 +84,10 @@ interface ModalProps {
   onClose: () => void
   month: string
   entry: AdviceEntry | null
-  status: Status
-  error: string | null
-  onRegenerate: () => void
+  status: MonthlyAdviceStatus
 }
 
-function AdviceModal({ open, onClose, month, entry, status, error, onRegenerate }: ModalProps) {
+function AdviceModal({ open, onClose, month, entry, status }: ModalProps) {
   const overlayRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -223,40 +117,20 @@ function AdviceModal({ open, onClose, month, entry, status, error, onRegenerate 
               <p className="text-xs text-neutral-400 capitalize">{monthLabel(month)}</p>
             </div>
           </div>
-          <div className="flex items-center gap-1">
-            {entry && (
-              <button
-                onClick={onRegenerate}
-                disabled={status === 'loading'}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium text-violet-700 hover:bg-violet-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <RefreshCw size={14} className={status === 'loading' ? 'animate-spin' : ''} />
-                Regenerar
-              </button>
-            )}
-            <button
-              onClick={onClose}
-              className="p-1.5 rounded-lg text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 transition-colors"
-            >
-              <X size={18} />
-            </button>
-          </div>
+          <button
+            onClick={onClose}
+            className="p-1.5 rounded-lg text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 transition-colors"
+          >
+            <X size={18} />
+          </button>
         </div>
 
         {/* Body */}
         <div className="px-6 py-6 flex flex-col gap-6">
-          {entry ? (
+          {status === 'ready' && entry ? (
             <Advice entry={entry} />
-          ) : status === 'error' ? (
-            <div className="flex flex-col items-center gap-3 py-10 text-center">
-              <p className="text-sm text-red-500">{error}</p>
-              <button
-                onClick={onRegenerate}
-                className="text-sm text-violet-600 hover:text-violet-800 underline underline-offset-2 transition-colors"
-              >
-                Reintentar
-              </button>
-            </div>
+          ) : status === 'empty' || status === 'error' ? (
+            <ErrorState status={status} month={month} />
           ) : (
             <LoadingSkeleton />
           )}
@@ -293,6 +167,25 @@ function Advice({ entry }: { entry: AdviceEntry }) {
   )
 }
 
+// Estado de error: la BD no devolvió consejos para el mes ('empty', típicamente
+// porque la generación falló al guardar) o la consulta falló ('error').
+function ErrorState({ status, month }: { status: MonthlyAdviceStatus; month: string }) {
+  const message =
+    status === 'empty'
+      ? `No encontramos consejos para ${monthLabel(month)}. Es posible que ocurriera un error al generarlos. Vuelve a cargar el estado de cuenta de este periodo para generarlos nuevamente.`
+      : 'No pudimos consultar tus consejos en este momento. Revisa tu conexión e inténtalo de nuevo más tarde.'
+
+  return (
+    <div className="flex flex-col items-center gap-3 py-10 text-center">
+      <div className="w-12 h-12 rounded-2xl bg-red-50 flex items-center justify-center">
+        <AlertTriangle size={24} className="text-red-500" />
+      </div>
+      <p className="text-base font-semibold text-neutral-900">No hay consejos disponibles</p>
+      <p className="text-sm text-neutral-500 max-w-sm leading-relaxed">{message}</p>
+    </div>
+  )
+}
+
 function LoadingSkeleton() {
   return (
     <div className="flex flex-col gap-6 animate-pulse">
@@ -300,7 +193,7 @@ function LoadingSkeleton() {
         <div className="w-10 h-10 rounded-full bg-violet-100 flex items-center justify-center">
           <Sparkles size={20} className="text-violet-300" />
         </div>
-        <p className="text-sm text-neutral-400">Analizando tus gastos...</p>
+        <p className="text-sm text-neutral-400">Consultando tus consejos...</p>
       </div>
       <div className="rounded-xl bg-violet-50 border border-violet-200 px-5 py-4 flex flex-col gap-2">
         <div className="h-3.5 w-40 rounded-full bg-violet-200" />
