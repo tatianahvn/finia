@@ -57,17 +57,14 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  // Asegura que el usuario tenga las categorías por defecto (siembra perezosa
-  // para usuarios que se registraron antes de la migración) y lee su taxonomía
-  // —defaults + las que la IA descubrió en corridas previas— para alimentar el
-  // prompt. Si falla la lectura, se continúa con una lista vacía (el LLM podrá
-  // proponer categorías nuevas igualmente).
-  await supabase.rpc("seed_default_categories", { p_user_id: user.id })
-
+  // Lee la taxonomía del usuario: globales (defaults) + custom (IA/usuario).
+  // Si falla la lectura, se continúa con lista vacía (el LLM podrá proponer
+  // categorías nuevas igualmente).
   const { data: catRows } = await supabase
     .from("categories")
     .select("slug, label, description, examples")
-    .eq("user_id", user.id)
+    .or(`user_id.is.null,user_id.eq.${user.id}`)
+    .eq("is_active", true)
 
   const categories: CategoryForPrompt[] = (catRows ?? []).map(c => ({
     slug: c.slug,

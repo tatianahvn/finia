@@ -73,14 +73,13 @@ export default function FileUpload({ onSaved }: Props) {
         throw new Error(error ?? 'Error al procesar el archivo')
       }
 
-      const { results }: { results: ParsedResult[] } = await res.json()
-      const parsed = results?.[0]
-      if (!parsed?.text) throw new Error('No se pudo extraer texto del PDF')
+      const { result }: { result: ParsedResult } = await res.json()
+      if (!result?.text) throw new Error('No se pudo extraer texto del PDF')
 
       const categorizeRes = await fetch('/api/statements/categorize', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: parsed.text, filename: parsed.name }),
+        body: JSON.stringify({ text: result.text, filename: result.name }),
       })
       if (!categorizeRes.ok) {
         const { error } = await categorizeRes.json()
@@ -88,7 +87,7 @@ export default function FileUpload({ onSaved }: Props) {
       }
 
       const { data }: { data: ParsedStatement } = await categorizeRes.json()
-      setReview({ filename: parsed.name, data })
+      setReview({ filename: result.name, data })
       setStatus('idle')
     } catch (err) {
       setStatus('error')

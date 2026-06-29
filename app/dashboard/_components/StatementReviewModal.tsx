@@ -53,7 +53,7 @@ export default function StatementReviewModal({
   // que sus badges se rendericen con label/emoji/color correctos en el modal.
   useEffect(() => {
     if (statement?.nuevas_categorias?.length) {
-      registerCategories(statement.nuevas_categorias.map(c => ({ ...c, origin: 'ai' as const })))
+      registerCategories(statement.nuevas_categorias.map(c => ({ ...c, created_by: 'ai' as const })))
     }
   }, [statement])
 

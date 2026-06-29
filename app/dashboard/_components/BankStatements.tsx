@@ -36,7 +36,7 @@ interface BankStatementsProps {
 }
 
 export default function BankStatements({ reloadKey = 0 }: BankStatementsProps) {
-  const { refresh } = useAnalysis()
+  const { reloadStatement } = useAnalysis()
   const [rows, setRows] = useState<AnalysisRow[]>([])
   const [loading, setLoading] = useState(true)
   const [pendingDelete, setPendingDelete] = useState<AnalysisRow | null>(null)
@@ -123,11 +123,11 @@ export default function BankStatements({ reloadKey = 0 }: BankStatementsProps) {
         })
       )
       setDetailTxs(updated)
-      await refresh()
+      await reloadStatement()
     } finally {
       setSavingDetail(false)
     }
-  }, [detailTxs, refresh])
+  }, [detailTxs, reloadStatement])
 
   const handleDelete = async () => {
     if (!pendingDelete) return
@@ -137,7 +137,7 @@ export default function BankStatements({ reloadKey = 0 }: BankStatementsProps) {
       if (!res.ok) throw new Error('No se pudo eliminar')
       setPendingDelete(null)
       await load()
-      await refresh()
+      await reloadStatement()
     } catch (err) {
       console.error(err)
     } finally {

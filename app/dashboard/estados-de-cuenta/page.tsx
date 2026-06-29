@@ -6,12 +6,12 @@ import FileUpload from '../_components/FileUpload'
 import BankStatements from '../_components/BankStatements'
 
 export default function EstadosDeCuentaPage() {
-  const { refresh } = useAnalysis()
+  const { reloadStatement } = useAnalysis()
   const [reloadKey, setReloadKey] = useState(0)
 
   async function handleSaved() {
     setReloadKey(k => k + 1)
-    await refresh()
+    await reloadStatement()
   }
 
   return (

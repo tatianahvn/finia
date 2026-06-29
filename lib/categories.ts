@@ -51,7 +51,7 @@ function colorForSlug(slug: string): string {
 }
 
 export function metaFromRecord(rec: CategoryRecord): CategoryMeta {
-  const isDefault = !!DEFAULT_CATEGORY_META[rec.slug] && rec.origin === 'default'
+  const isDefault = !!DEFAULT_CATEGORY_META[rec.slug] && rec.created_by === 'system'
   return {
     label: rec.label,
     emoji: rec.emoji || (isDefault ? DEFAULT_CATEGORY_META[rec.slug].emoji : '🏷️'),

@@ -69,6 +69,8 @@ create table if not exists public.transactions (
   tipo         text not null default 'desconocido',
   categoria    text not null default 'otros',
   confianza    numeric not null default 0,
+  categorized_by text not null default 'ai'
+                   check (categorized_by in ('ai', 'user')),
   created_at   timestamptz not null default now()
 );
 
@@ -149,7 +151,8 @@ begin
   for v_tx in select * from jsonb_array_elements(v_transacciones)
   loop
     insert into public.transactions (
-      statement_id, user_id, fecha, descripcion, comercio, monto, tipo, categoria, confianza
+      statement_id, user_id, fecha, descripcion, comercio, monto, tipo,
+      categoria, confianza, categorized_by
     ) values (
       v_statement_id,
       v_user_id,
@@ -159,7 +162,8 @@ begin
       coalesce((v_tx->>'monto')::numeric, 0),
       coalesce(v_tx->>'tipo', 'desconocido'),
       coalesce(v_tx->>'categoria', 'otros'),
-      coalesce((v_tx->>'confianza')::numeric, 0)
+      coalesce((v_tx->>'confianza')::numeric, 0),
+      coalesce(v_tx->>'categorized_by', 'ai')
     );
   end loop;
 

@@ -63,7 +63,7 @@ begin
   loop
     insert into public.transactions (
       statement_id, user_id, fecha, descripcion, comercio, monto, tipo,
-      categoria, confianza, concepto_normalizado
+      categoria, confianza, categorized_by, concepto_normalizado
     ) values (
       v_statement_id,
       v_user_id,
@@ -74,6 +74,7 @@ begin
       coalesce(v_tx->>'tipo', 'desconocido'),
       coalesce(v_tx->>'categoria', 'otros'),
       coalesce((v_tx->>'confianza')::numeric, 0),
+      coalesce(v_tx->>'categorized_by', 'ai'),
       nullif(v_tx->>'concepto_normalizado', '')
     );
   end loop;

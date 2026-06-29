@@ -31,13 +31,14 @@ export async function PATCH(
     return NextResponse.json({ error: "No autenticado" }, { status: 401 })
   }
 
-  // La categoría debe existir en la taxonomía del usuario (defaults + creadas
-  // por la IA). Evita guardar slugs arbitrarios.
+  // La categoría debe existir: global (user_id IS NULL) o del usuario.
   const { data: cat } = await supabase
     .from("categories")
     .select("slug")
-    .eq("user_id", user.id)
+    .or(`user_id.is.null,user_id.eq.${user.id}`)
     .eq("slug", body.categoria)
+    .eq("is_active", true)
+    .limit(1)
     .maybeSingle()
 
   if (!cat) {
@@ -46,7 +47,7 @@ export async function PATCH(
 
   const { error, count } = await supabase
     .from("transactions")
-    .update({ categoria: body.categoria, confianza: 1 }, { count: "exact" })
+    .update({ categoria: body.categoria, confianza: 1, categorized_by: "user" }, { count: "exact" })
     .eq("id", id)
     .eq("user_id", user.id)
 

@@ -8,7 +8,7 @@ interface AnalysisContextValue {
   statement: ParsedStatement | null
   setStatement: (s: ParsedStatement | null) => void
   updateTransactionCategory: (id: string, categoria: string) => void
-  refresh: () => Promise<void>
+  reloadStatement: () => Promise<void>
   loading: boolean
 }
 
@@ -18,7 +18,7 @@ export function AnalysisProvider({ children }: { children: ReactNode }) {
   const [statement, setStatement] = useState<ParsedStatement | null>(null)
   const [loading, setLoading] = useState(true)
 
-  const refresh = useCallback(async () => {
+  const reloadStatement = useCallback(async () => {
     const supabase = createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) {
@@ -28,6 +28,7 @@ export function AnalysisProvider({ children }: { children: ReactNode }) {
     }
 
     // Resumen + advertencias del estado de cuenta más reciente.
+    // TODO: Hace falta cachar el error, solamente identifica si no hay registros, no si falla.
     const { data: latest } = await supabase
       .from('statements')
       .select('resumen, advertencias')
@@ -59,10 +60,10 @@ export function AnalysisProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     async function run() {
-      await refresh()
+      await reloadStatement()
     }
     run()
-  }, [refresh])
+  }, [reloadStatement])
 
   const updateTransactionCategory = useCallback((id: string, categoria: string) => {
     setStatement(prev => {
@@ -77,7 +78,7 @@ export function AnalysisProvider({ children }: { children: ReactNode }) {
   }, [])
 
   return (
-    <AnalysisContext.Provider value={{ statement, setStatement, updateTransactionCategory, refresh, loading }}>
+    <AnalysisContext.Provider value={{ statement, setStatement, updateTransactionCategory, reloadStatement, loading }}>
       {children}
     </AnalysisContext.Provider>
   )

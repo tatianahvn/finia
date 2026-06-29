@@ -5,21 +5,22 @@ export async function POST(request: NextRequest) {
   const formData = await request.formData()
   const files = formData.getAll("files") as File[]
 
-  if (!files.length) {
+  if (files.length !== 1) {
     return NextResponse.json(
-      { error: "No se recibieron archivos" },
+      { error: "Debes enviar exactamente un archivo PDF" },
       { status: 400 }
     )
   }
+  const file = files[0]
 
-  const validationError = validatePdfFile(files[0])
+  const validationError = validatePdfFile(file)
   if (validationError) {
     return NextResponse.json({ error: validationError }, { status: 415 })
   }
 
   try {
-    const results = await Promise.all(files.map(extractTextFromPdf))
-    return NextResponse.json({ results })
+    const result = await extractTextFromPdf(file)
+    return NextResponse.json({ result })
   } catch (error: unknown) {
     console.error("[parse-pdf] error:", error)
     const message = error instanceof Error ? error.message : "Error al leer el PDF"

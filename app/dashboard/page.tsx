@@ -19,13 +19,54 @@ export default function Dashboard() {
   if (loading) {
     return (
       <div className="flex flex-col gap-6 animate-pulse">
-        <div className="h-8 w-56 rounded-xl bg-neutral-200" />
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-28 rounded-2xl bg-neutral-200" />
-          ))}
+        <div className="h-8 w-40 rounded-xl bg-neutral-200" />
+
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <div className="grid grid-cols-2 gap-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div
+                key={i}
+                className="bg-white rounded-2xl p-5 shadow-sm flex items-center gap-4"
+              >
+                <div className="flex-1 flex flex-col gap-2">
+                  <div className="h-6 w-24 rounded-full bg-neutral-200" />
+                  <div className="h-7 w-20 rounded-lg bg-neutral-200" />
+                </div>
+                <div className="w-12 h-12 rounded-xl bg-neutral-200 shrink-0" />
+              </div>
+            ))}
+          </div>
+
+          <div className="bg-white rounded-2xl p-6 shadow-sm flex flex-col gap-6">
+            <div className="h-4 w-40 rounded bg-neutral-200" />
+            <div className="flex-1 min-h-64 rounded-xl bg-neutral-200" />
+          </div>
         </div>
-        <div className="h-64 rounded-2xl bg-neutral-200" />
+
+        <div className="bg-white rounded-2xl p-6 shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <div className="h-4 w-44 rounded bg-neutral-200" />
+            <div className="h-3 w-16 rounded bg-neutral-200" />
+          </div>
+          <div className="flex flex-col">
+            <div className="flex gap-4 border-b border-neutral-200 pb-3">
+              {['w-16', 'flex-1', 'w-24', 'w-20'].map((w, i) => (
+                <div key={i} className={`h-3 ${w} rounded bg-neutral-200`} />
+              ))}
+            </div>
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div
+                key={i}
+                className="flex items-center gap-4 border-b border-neutral-100 last:border-0 py-3"
+              >
+                <div className="h-4 w-16 rounded bg-neutral-200" />
+                <div className="h-4 flex-1 rounded bg-neutral-200" />
+                <div className="h-5 w-24 rounded-full bg-neutral-200" />
+                <div className="h-4 w-20 rounded bg-neutral-200" />
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     )
   }
@@ -35,15 +76,7 @@ export default function Dashboard() {
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-neutral-900">Resumen</h1>
-          <p className="text-sm text-neutral-500 mt-1">
-            Vista general de tu actividad financiera reciente.
-          </p>
         </div>
-        {statement && (
-          <span className="text-xs text-neutral-500 mt-1.5 shrink-0">
-            {statement.resumen.banco} · {statement.resumen.periodo_inicio} — {statement.resumen.periodo_fin}
-          </span>
-        )}
       </div>
 
       {!statement ? (

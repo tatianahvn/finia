@@ -43,7 +43,9 @@ export interface CategorySuggestion {
 export interface CategoryRecord extends CategorySuggestion {
   color?: string;
   badge_classes?: string;
-  origin: "default" | "ai";
+  created_by: "system" | "ai" | "user";
+  source_context?: string | null;
+  is_active?: boolean;
 }
 
 export interface Transaction {
@@ -56,6 +58,7 @@ export interface Transaction {
   tipo: TransactionType;
   categoria: string;       // slug de categoría (default o creada por IA)
   confianza: number;       // 0 a 1
+  categorized_by?: "ai" | "user";  // quién asignó la categoría
   concepto_normalizado?: string | null;  // nombre de concepto normalizado por IA (persistido al guardar)
 }
 
@@ -76,8 +79,6 @@ export interface ParsedStatement {
   resumen: StatementSummary;
   transacciones: Transaction[];
   advertencias: string[];
-  // Categorías nuevas que la IA propuso porque ninguna existente encajaba.
-  // Se persisten al guardar el estado de cuenta.
   nuevas_categorias?: CategorySuggestion[];
 }
 
