@@ -1,5 +1,5 @@
 -- =============================================================================
--- 005_advice.sql
+-- 003_advice.sql
 -- Persiste los consejos financieros generados por la IA.
 --
 -- Antes vivían solo en localStorage (por navegador). Ahora se almacenan por

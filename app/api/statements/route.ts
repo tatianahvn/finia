@@ -20,7 +20,7 @@ function normalizeSlug(raw: string): string {
     .replace(/^_+|_+$/g, "")
 }
 
-// Persiste best-effort las categorías nuevas que la IA propuso (origin = 'ai').
+// Persiste best-effort las categorías nuevas que la IA propuso (created_by = 'ai').
 // Si falla, el guardado del estado de cuenta continúa: la categoría queda en las
 // transacciones como texto y solo se pierde su metadata en la tabla categories.
 async function persistNewCategories(

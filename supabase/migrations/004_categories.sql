@@ -1,5 +1,5 @@
 -- =============================================================================
--- 006_categories.sql  (REESCRITA — reemplaza la versión anterior)
+-- 004_categories.sql  (REESCRITA — reemplaza la versión anterior)
 --
 -- Esquema de categorías con dos tipos:
 --   · Globales (user_id IS NULL, created_by = 'system'):
@@ -186,28 +186,13 @@ end;
 $$;
 
 
--- ----------------------------------------------------------------------------
--- 5. handle_new_user() — solo créditos, ya no necesita sembrar categorías
---    (las defaults son globales, no per-user).
--- ----------------------------------------------------------------------------
-create or replace function public.handle_new_user()
-returns trigger
-language plpgsql
-security definer
-set search_path = public
-as $$
-begin
-  insert into public.credits (user_id, balance)
-  values (new.id, 2)
-  on conflict (user_id) do nothing;
-
-  return new;
-end;
-$$;
+-- handle_new_user() ya no necesita sembrar categorías (las defaults son
+-- globales). La función de 002_credits.sql (solo créditos) es la correcta;
+-- no se redefine aquí.
 
 
 -- ----------------------------------------------------------------------------
--- 6. Query de lectura para el frontend (referencia / se puede usar como RPC)
+-- 5. Query de lectura para el frontend (referencia / se puede usar como RPC)
 -- ----------------------------------------------------------------------------
 -- SELECT * FROM categories
 -- WHERE user_id IS NULL OR user_id = auth.uid()

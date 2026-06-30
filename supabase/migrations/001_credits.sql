@@ -1,5 +1,5 @@
 -- =============================================================================
--- 002_credits.sql
+-- 001_credits.sql
 -- Sistema de créditos por usuario.
 --   · Una fila por usuario (PK = user_id)
 --   · Trigger en auth.users → 2 créditos gratuitos al registrarse
@@ -107,3 +107,14 @@ drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_user();
+
+
+-- ----------------------------------------------------------------------------
+-- 5. Seed: 99 créditos para tatyshvn@gmail.com
+-- ----------------------------------------------------------------------------
+insert into public.credits (user_id, balance)
+select id, 99
+from auth.users
+where email = 'tatyshvn@gmail.com'
+on conflict (user_id) do update
+  set balance = 99, updated_at = now();
