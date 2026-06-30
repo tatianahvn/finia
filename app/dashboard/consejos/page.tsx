@@ -80,8 +80,8 @@ export default function ConsejosPage() {
     return (
       <div className="flex flex-col gap-6">
         <div>
-          <h1 className="text-2xl font-bold text-neutral-900">Consejos financieros</h1>
-          <p className="text-sm text-neutral-500 mt-1">
+          <h1 className="text-3xl font-bold text-neutral-900">Consejos financieros</h1>
+          <p className="text-md text-neutral-500 mt-1">
             Recomendaciones personalizadas generadas a partir de tus gastos.
           </p>
         </div>
@@ -115,8 +115,8 @@ export default function ConsejosPage() {
     <div className="flex flex-col gap-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-neutral-900">Consejos financieros</h1>
-          <p className="text-sm text-neutral-500 mt-1">
+          <h1 className="text-3xl font-bold text-neutral-900">Consejos financieros</h1>
+          <p className="text-md text-neutral-500 mt-1">
             Recomendaciones personalizadas generadas a partir de tus gastos.
           </p>
         </div>

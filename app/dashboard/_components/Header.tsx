@@ -15,7 +15,7 @@ export default function Header() {
         className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-violet-50 hover:bg-violet-100 transition-colors group"
       >
         <Zap size={13} className="text-violet-500 group-hover:text-violet-700 transition-colors" />
-        <span className="text-xs font-semibold text-violet-700">
+        <span className="text-sm font-semibold text-violet-700">
           {loading ? '—' : `${balance ?? 0} crédito${balance === 1 ? '' : 's'}`}
         </span>
       </Link>

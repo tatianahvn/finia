@@ -75,7 +75,7 @@ export default function Dashboard() {
     <div className="flex flex-col gap-6 min-h-full">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-neutral-900">Resumen</h1>
+          <h1 className="text-3xl font-bold text-neutral-900">Resumen</h1>
         </div>
       </div>
 

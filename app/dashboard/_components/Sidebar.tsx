@@ -62,7 +62,7 @@ export default function Sidebar() {
             <Link
               key={href}
               href={href}
-              className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${isActive
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-base transition-colors ${isActive
                 ? 'bg-violet-100 text-violet-800 font-semibold'
                 : 'text-neutral-500 hover:bg-violet-50 hover:text-violet-800'
                 }`}
@@ -82,15 +82,15 @@ export default function Sidebar() {
 
           <div className="flex items-center gap-1.5 pt-5">
             <Zap size={15} className="text-violet-200" />
-            <p className="text-sm font-semibold text-white">Obtén más créditos</p>
+            <p className="text-base font-semibold text-white">Obtén más créditos</p>
           </div>
 
-          <p className="text-sm text-violet-200 leading-relaxed mb-3">
+          <p className="text-base text-violet-200 leading-relaxed mb-3">
             Más análisis y funciones avanzadas para tus finanzas
           </p>
           <Link
             href="/upgrade"
-            className="block text-center text-sm font-semibold bg-white text-violet-700 rounded-lg py-1.5 hover:bg-violet-50 transition-colors"
+            className="block text-center text-base font-semibold bg-white text-violet-700 rounded-lg py-1.5 hover:bg-violet-50 transition-colors"
           >
             Créditos →
           </Link>
@@ -106,8 +106,8 @@ export default function Sidebar() {
             {displayName ? getInitials(displayName) : '…'}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-neutral-900 truncate">{displayName || '—'}</p>
-            <p className="text-xs text-neutral-400 truncate">{email || '—'}</p>
+            <p className="text-base font-medium text-neutral-900 truncate">{displayName || '—'}</p>
+            <p className="text-sm text-neutral-400 truncate">{email || '—'}</p>
           </div>
         </Link>
       </div>

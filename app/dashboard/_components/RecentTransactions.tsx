@@ -16,18 +16,18 @@ export default function RecentTransactions({ transactions }: Props) {
   return (
     <section className="bg-white rounded-2xl p-6 shadow-sm">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-sm font-bold tracking-widest text-violet-700 uppercase">
+        <h2 className="text-base font-bold tracking-widest text-violet-700 uppercase">
           Últimas transacciones
         </h2>
         <Link
           href="/dashboard/transacciones"
-          className="text-xs text-violet-600 hover:text-violet-800 underline underline-offset-2 transition-colors"
+          className="text-sm text-violet-600 hover:text-violet-800 underline underline-offset-2 transition-colors"
         >
           Ver todas
         </Link>
       </div>
 
-      <table className="w-full text-sm">
+      <table className="w-full text-base">
         <thead>
           <tr className="border-b border-neutral-200">
             {['Fecha', 'Descripción', 'Categoría', 'Monto'].map(col => (
@@ -53,7 +53,7 @@ export default function RecentTransactions({ transactions }: Props) {
                   {tx.comercio ?? tx.descripcion}
                 </td>
                 <td className="py-3 pr-4">
-                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${meta.badgeClasses}`}>
+                  <span className={`text-sm font-medium px-2.5 py-0.5 rounded-full ${meta.badgeClasses}`}>
                     {meta.label}
                   </span>
                 </td>

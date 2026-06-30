@@ -31,7 +31,7 @@ export default function PerfilPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-2xl font-bold text-neutral-900">Perfil</h1>
+      <h1 className="text-3xl font-bold text-neutral-900">Perfil</h1>
 
       <div className="flex flex-col gap-6 items-center">
         {/* Account card */}

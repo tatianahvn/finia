@@ -47,10 +47,10 @@ export default function StatCards({ resumen, count }: Props) {
         {stats.map(({ label, value, icon: Icon, badgeClass, iconClass }) => (
           <div key={label} className="bg-white rounded-2xl p-5 shadow-sm flex items-center gap-4">
             <div className="flex-1 flex flex-col gap-2">
-              <span className={`self-start text-sm font-semibold px-2.5 py-1 rounded-full ${iconClass}`}>
+              <span className={`self-start text-base font-semibold px-2.5 py-1 rounded-full ${iconClass}`}>
                 {label}
               </span>
-              <p className="text-2xl font-bold text-neutral-900">{value}</p>
+              <p className="text-3xl font-bold text-neutral-900">{value}</p>
             </div>
             <div className={`flex items-center justify-center ${badgeClass} rounded-xl w-12 h-12 shrink-0`}>
               <Icon size={24} className={iconClass} />

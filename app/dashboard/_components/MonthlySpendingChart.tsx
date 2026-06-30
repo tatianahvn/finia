@@ -41,7 +41,7 @@ export default function MonthlySpendingChart({ transactions, months }: Props) {
 
   return (
     <section className="bg-white rounded-2xl p-6 shadow-sm flex flex-col gap-6">
-      <h2 className="text-sm font-bold tracking-widest text-violet-700 uppercase">
+      <h2 className="text-base font-bold tracking-widest text-violet-700 uppercase">
         Gasto total por mes
       </h2>
 

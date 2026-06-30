@@ -55,8 +55,8 @@ export default function TransaccionesPage() {
     return (
       <div className="flex flex-col gap-6 min-h-full">
         <div className="shrink-0">
-          <h1 className="text-2xl font-bold text-neutral-900">Transacciones</h1>
-          <p className="text-sm text-neutral-500 mt-1">
+          <h1 className="text-3xl font-bold text-neutral-900">Transacciones</h1>
+          <p className="text-md text-neutral-500 mt-1">
             Detalle mes a mes de cada movimiento extraído de tus estados de cuenta.
           </p>
         </div>
@@ -71,8 +71,8 @@ export default function TransaccionesPage() {
   return (
     <div className="flex flex-col h-full gap-4">
       <div className="shrink-0">
-        <h1 className="text-2xl font-bold text-neutral-900">Transacciones</h1>
-        <p className="text-sm text-neutral-500 mt-1">
+        <h1 className="text-3xl font-bold text-neutral-900">Transacciones</h1>
+        <p className="text-md text-neutral-500 mt-1">
           Detalle mes a mes de cada movimiento extraído de tus estados de cuenta. Ajusta su categoría manualmente cuando lo necesites.
         </p>
       </div>

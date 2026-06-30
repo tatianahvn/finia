@@ -31,32 +31,32 @@ export default function DataTable({ transactions }: Props) {
   return (
     <section className="bg-white rounded-2xl p-6 shadow-sm flex flex-col h-full">
       <div className="shrink-0 flex items-center justify-between mb-4">
-        <h2 className="text-sm font-bold tracking-widest text-violet-700 uppercase">
+        <h2 className="text-base font-bold tracking-widest text-violet-700 uppercase">
           Transacciones
         </h2>
       </div>
 
       <div className="shrink-0 grid grid-cols-4 gap-3 mb-6">
         <div className="rounded-xl bg-emerald-50 px-4 py-3">
-          <p className="text-xs font-medium text-emerald-600 tracking-wide mb-1">Ingresos</p>
-          <p className="text-base font-bold text-emerald-700">${fmt(ingresos)}</p>
+          <p className="text-sm font-medium text-emerald-600 tracking-wide mb-1">Ingresos</p>
+          <p className="text-lg font-bold text-emerald-700">${fmt(ingresos)}</p>
         </div>
         <div className="rounded-xl bg-red-50 px-4 py-3">
-          <p className="text-xs font-medium text-red-500 tracking-wide mb-1">Egresos</p>
-          <p className="text-base font-bold text-red-600">${fmt(egresos)}</p>
+          <p className="text-sm font-medium text-red-500 tracking-wide mb-1">Egresos</p>
+          <p className="text-lg font-bold text-red-600">${fmt(egresos)}</p>
         </div>
         <div className={`rounded-xl px-4 py-3 ${balance >= 0 ? 'bg-emerald-50' : 'bg-red-50'}`}>
-          <p className={`text-xs font-medium tracking-wide mb-1 ${balance >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>Balance</p>
-          <p className={`text-base font-bold ${balance >= 0 ? 'text-emerald-700' : 'text-red-600'}`}>{balance >= 0 ? '+' : '-'}${fmt(Math.abs(balance))}</p>
+          <p className={`text-sm font-medium tracking-wide mb-1 ${balance >= 0 ? 'text-emerald-600' : 'text-red-500'}`}>Balance</p>
+          <p className={`text-lg font-bold ${balance >= 0 ? 'text-emerald-700' : 'text-red-600'}`}>{balance >= 0 ? '+' : '-'}${fmt(Math.abs(balance))}</p>
         </div>
         <div className="rounded-xl bg-violet-50 px-4 py-3">
-          <p className="text-xs font-medium text-violet-600 tracking-wide mb-1">Transacciones</p>
-          <p className="text-base font-bold text-violet-700">{transactions.length}</p>
+          <p className="text-sm font-medium text-violet-600 tracking-wide mb-1">Transacciones</p>
+          <p className="text-lg font-bold text-violet-700">{transactions.length}</p>
         </div>
       </div>
 
       <div className="flex-1 min-h-0 overflow-x-auto overflow-y-auto">
-        <table className="w-full text-sm">
+        <table className="w-full text-base">
           <thead className="sticky top-0 bg-white">
             <tr className="border-b border-neutral-200">
               {columns.map(col => (
@@ -72,7 +72,7 @@ export default function DataTable({ transactions }: Props) {
           <tbody>
             {transactions.length === 0 ? (
               <tr>
-                <td colSpan={columns.length} className="py-12 text-center text-neutral-400 text-sm">
+                <td colSpan={columns.length} className="py-12 text-center text-neutral-400 text-base">
                   Carga un archivo para ver tus transacciones
                 </td>
               </tr>
@@ -89,7 +89,7 @@ export default function DataTable({ transactions }: Props) {
                       {tx.comercio ?? tx.descripcion}
                     </td>
                     <td className="py-3 pr-4">
-                      <span className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full ${meta.badgeClasses}`}>
+                      <span className={`inline-flex items-center gap-1 text-base font-medium px-2.5 py-0.5 rounded-full ${meta.badgeClasses}`}>
                         <span aria-hidden>{meta.emoji}</span>
                         {meta.label}
                       </span>

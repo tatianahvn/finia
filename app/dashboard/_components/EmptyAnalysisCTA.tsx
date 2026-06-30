@@ -23,13 +23,13 @@ export default function EmptyAnalysisCTA({
       </div>
 
       <div>
-        <p className="text-base font-semibold text-neutral-900">{title}</p>
-        <p className="text-sm text-neutral-400 mt-1 max-w-xs mx-auto">{subtitle}</p>
+        <p className="text-lg font-semibold text-neutral-900">{title}</p>
+        <p className="text-base text-neutral-400 mt-1 max-w-xs mx-auto">{subtitle}</p>
       </div>
 
       <Link
         href="/dashboard/estados-de-cuenta"
-        className="flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm text-white
+        className="flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-base text-white
           bg-gradient-to-r from-violet-600 to-fuchsia-500
           hover:from-violet-700 hover:to-fuchsia-600
           shadow-md hover:shadow-lg
@@ -44,7 +44,7 @@ export default function EmptyAnalysisCTA({
           <div className="h-6 w-44 rounded-full bg-neutral-100 animate-pulse" />
         ) : noCredits ? (
           <>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-50 text-red-600 text-xs font-semibold">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-50 text-red-600 text-sm font-semibold">
               <Zap size={12} />
               No tienes créditos disponibles
             </div>
@@ -57,7 +57,7 @@ export default function EmptyAnalysisCTA({
           </>
         ) : (
           <>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-violet-50 text-violet-700 text-xs font-semibold">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-violet-50 text-violet-700 text-sm font-semibold">
               <Zap size={12} />
               Costo: 1 crédito por análisis
             </div>
