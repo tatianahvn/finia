@@ -105,7 +105,7 @@ export default function SpendingByConcept({ transactions }: Props) {
   return (
     <section className="bg-white rounded-2xl p-6 shadow-sm">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-sm font-bold tracking-widest text-violet-700 uppercase">
+        <h2 className="text-base font-bold tracking-widest text-violet-700 uppercase">
           Gasto por concepto
         </h2>
       </div>
@@ -116,9 +116,9 @@ export default function SpendingByConcept({ transactions }: Props) {
         </p>
       ) : (
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-base">
             <thead>
-              <tr className="border-b border-neutral-100 text-left text-xs text-neutral-500 uppercase tracking-wider">
+              <tr className="border-b border-neutral-100 text-left text-sm text-neutral-500 uppercase tracking-wider">
                 <th className="pb-3 pr-4 w-10">#</th>
                 <th className="pb-3 pr-4">
                   <HeaderSort label="Concepto" sortKey="name" activeKey={sortKey} dir={sortDir} onSort={toggleSort} />
@@ -144,10 +144,10 @@ export default function SpendingByConcept({ transactions }: Props) {
                   >
                     <td className="py-3 pr-4 text-neutral-300 font-medium tabular-nums">{i + 1}</td>
                     <td className="py-3 pr-4">
-                      <span className="font-medium text-neutral-800 block">{name}</span>
+                      <span className="font-medium text-neutral-800 block text-base">{name}</span>
                       {rawNames.length > 0 && (
                         <span
-                          className="text-xs text-neutral-400 block mt-0.5 truncate max-w-xs"
+                          className="text-sm text-neutral-400 block mt-0.5 truncate max-w-xs"
                           title={rawNames.join(' · ')}
                         >
                           {rawNames.join(' · ')}
@@ -155,12 +155,12 @@ export default function SpendingByConcept({ transactions }: Props) {
                       )}
                     </td>
                     <td className="py-3 pr-4">
-                      <span className={`inline-flex items-center gap-1 text-sm font-medium px-3 py-0.9 rounded-full ${meta.badgeClasses}`}>
+                      <span className={`inline-flex items-center gap-1 text-base font-medium px-3 py-1 rounded-full ${meta.badgeClasses}`}>
                         <span>{meta.label}</span>
                       </span>
                     </td>
-                    <td className="py-3 pr-4 text-center tabular-nums text-neutral-500">{count}</td>
-                    <td className="py-3 text-right tabular-nums font-semibold text-neutral-800">
+                    <td className="py-3 pr-4 text-center tabular-nums text-base text-neutral-500">{count}</td>
+                    <td className="py-3 text-right tabular-nums font-semibold text-base text-neutral-800">
                       {formatCurrency(total)}
                     </td>
                   </tr>

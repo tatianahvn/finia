@@ -19,9 +19,6 @@ interface Props {
   month: string  // "YYYY-MM"
 }
 
-// Tarjeta de SOLO LECTURA. No genera consejos: solo consulta a la BD los del mes
-// en visualización (con caché en memoria). La generación ocurre exclusivamente al
-// guardar el estado de cuenta con las categorías refinadas por el usuario.
 export default function FinancialAdviceCard({ transactions, month }: Props) {
   const [open, setOpen] = useState(false)
 
@@ -29,44 +26,67 @@ export default function FinancialAdviceCard({ transactions, month }: Props) {
   const { entry, status } = useMonthlyAdvice(month, hasGastos)
 
   const loading = status === 'loading'
+  const previewConsejos = entry?.consejos?.slice(0, 4) ?? []
 
   return (
-    <section className="rounded-2xl p-6 shadow-sm flex flex-col items-center justify-center text-center h-full bg-violet-600 text-white">
-      <div className="flex items-center justify-center mb-4">
-        <ChartNoAxesCombined size={38} className="text-white" />
+    <section className="rounded-2xl p-6 shadow-sm flex flex-col h-full bg-gradient-to-br from-violet-700 via-violet-600 to-violet-800 text-white">
+      <div className="flex items-center gap-3 mb-3">
+        <ChartNoAxesCombined size={30} className="text-white shrink-0" />
+        <div>
+          <h2 className="text-lg font-bold leading-tight">Tus consejos financieros</h2>
+          <p className="text-sm text-violet-200 leading-snug mt-0.5">
+            Recomendaciones basadas en tus gastos{month ? ` de ${monthLabel(month)}` : ''}
+          </p>
+        </div>
       </div>
 
-      <h2 className="text-lg font-bold">Tus consejos financieros</h2>
-      <p className="text-sm text-violet-100 leading-relaxed mt-2 max-w-xs">
-        A partir del análisis de tus gastos{month ? ` de ${monthLabel(month)}` : ''}, preparamos
-        recomendaciones personalizadas para ayudarte a ahorrar y mejorar tus finanzas.
-      </p>
+      {loading ? (
+        <div className="flex-1 flex flex-col items-center justify-center gap-2 py-6">
+          <Loader2 size={24} className="animate-spin text-violet-200" />
+          <p className="text-sm text-violet-200">Consultando tus consejos…</p>
+        </div>
+      ) : previewConsejos.length > 0 ? (
+        <div className="flex-1 flex flex-col gap-2 mt-2 bg-white/10 rounded-xl p-4 overflow-y-auto">
+          <p className="text-xs font-bold uppercase tracking-wider text-violet-300 mb-1">
+            Vista previa
+          </p>
+          {previewConsejos.map((consejo, i) => (
+            <div key={i}>
+              <div className="flex items-start gap-2.5">
+                <span className="text-lg shrink-0 mt-0.5">{consejo.icono}</span>
+                <div className="min-w-0">
+                  <p className="text-base font-semibold text-white leading-tight">{consejo.titulo}</p>
+                  <p className="text-sm text-violet-200 leading-snug mt-0.5 line-clamp-2">{consejo.descripcion}</p>
+                </div>
+              </div>
+              {i < previewConsejos.length - 1 && (
+                <div className="h-px bg-white/10 mt-2" />
+              )}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="flex-1 flex flex-col items-center justify-center text-center py-4">
+          <Sparkles size={24} className="text-violet-200 mb-2" />
+          <p className="text-base text-violet-100 leading-relaxed max-w-[240px]">
+            {!hasGastos
+              ? 'No hay gastos en este mes para generar consejos.'
+              : 'Sube un estado de cuenta para ver recomendaciones personalizadas.'}
+          </p>
+        </div>
+      )}
 
       <button
         onClick={() => setOpen(true)}
-        disabled={!hasGastos}
-        className="mt-5 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm
-          bg-white text-violet-700 hover:bg-violet-50 transition-colors
+        disabled={!hasGastos || loading}
+        className="mt-4 w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-base
+          bg-white text-violet-700 hover:bg-violet-50 transition-colors shrink-0
           disabled:opacity-60 disabled:cursor-not-allowed"
       >
-        {loading ? (
-          <>
-            <Loader2 size={16} className="animate-spin" />
-            Consultando consejos…
-          </>
-        ) : (
-          <>
-            Ver mis consejos financieros
-            <ArrowRight size={16} />
-          </>
-        )}
+        <Sparkles size={14} />
+        Ver análisis completo
+        <ArrowRight size={14} />
       </button>
-
-      {!hasGastos && (
-        <p className="mt-2 text-xs text-violet-200 text-center">
-          No hay gastos en este mes para generar consejos.
-        </p>
-      )}
 
       <AdviceModal
         open={open}
@@ -113,8 +133,8 @@ function AdviceModal({ open, onClose, month, entry, status }: ModalProps) {
               <Sparkles size={16} className="text-violet-600" />
             </div>
             <div>
-              <p className="text-sm font-bold text-neutral-900">Consejos financieros</p>
-              <p className="text-xs text-neutral-400 capitalize">{monthLabel(month)}</p>
+              <p className="text-base font-bold text-neutral-900">Consejos financieros</p>
+              <p className="text-sm text-neutral-400 capitalize">{monthLabel(month)}</p>
             </div>
           </div>
           <button
@@ -144,8 +164,8 @@ function Advice({ entry }: { entry: AdviceEntry }) {
   return (
     <>
       <div className="rounded-xl bg-violet-50 border border-violet-200 px-5 py-4">
-        <p className="text-sm font-semibold text-violet-800 mb-1">Resumen de tus gastos</p>
-        <p className="text-sm text-violet-700 leading-relaxed">{entry.resumen}</p>
+        <p className="text-base font-semibold text-violet-800 mb-1">Resumen de tus gastos</p>
+        <p className="text-base text-violet-700 leading-relaxed">{entry.resumen}</p>
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -153,14 +173,14 @@ function Advice({ entry }: { entry: AdviceEntry }) {
           <div key={i} className="flex gap-4 rounded-xl bg-neutral-50 border border-neutral-100 p-4">
             <span className="text-2xl shrink-0 mt-0.5">{consejo.icono}</span>
             <div className="flex flex-col gap-1">
-              <p className="text-sm font-semibold text-neutral-900">{consejo.titulo}</p>
-              <p className="text-sm text-neutral-500 leading-relaxed">{consejo.descripcion}</p>
+              <p className="text-base font-semibold text-neutral-900">{consejo.titulo}</p>
+              <p className="text-base text-neutral-500 leading-relaxed">{consejo.descripcion}</p>
             </div>
           </div>
         ))}
       </div>
 
-      <p className="text-xs text-neutral-400 text-center">
+      <p className="text-sm text-neutral-400 text-center">
         Guardado en tu historial · Powered by Groq · Llama 3.3
       </p>
     </>
@@ -180,8 +200,8 @@ function ErrorState({ status, month }: { status: MonthlyAdviceStatus; month: str
       <div className="w-12 h-12 rounded-2xl bg-red-50 flex items-center justify-center">
         <AlertTriangle size={24} className="text-red-500" />
       </div>
-      <p className="text-base font-semibold text-neutral-900">No hay consejos disponibles</p>
-      <p className="text-sm text-neutral-500 max-w-sm leading-relaxed">{message}</p>
+      <p className="text-lg font-semibold text-neutral-900">No hay consejos disponibles</p>
+      <p className="text-base text-neutral-500 max-w-sm leading-relaxed">{message}</p>
     </div>
   )
 }
