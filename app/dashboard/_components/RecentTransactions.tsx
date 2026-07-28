@@ -53,7 +53,8 @@ export default function RecentTransactions({ transactions }: Props) {
                   {tx.comercio ?? tx.descripcion}
                 </td>
                 <td className="py-3 pr-4">
-                  <span className={`text-sm font-medium px-2.5 py-0.5 rounded-full ${meta.badgeClasses}`}>
+                  <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full ${meta.badgeClasses}`}>
+                    <span aria-hidden>{meta.emoji}</span>
                     {meta.label}
                   </span>
                 </td>

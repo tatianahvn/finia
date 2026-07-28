@@ -155,8 +155,9 @@ export default function SpendingByConcept({ transactions }: Props) {
                       )}
                     </td>
                     <td className="py-3 pr-4">
-                      <span className={`inline-flex items-center gap-1 text-base font-medium px-3 py-1 rounded-full ${meta.badgeClasses}`}>
-                        <span>{meta.label}</span>
+                      <span className={`inline-flex items-center gap-1 font-medium px-2.5 py-0.5 rounded-full ${meta.badgeClasses}`}>
+                        <span aria-hidden>{meta.emoji}</span>
+                        {meta.label}
                       </span>
                     </td>
                     <td className="py-3 pr-4 text-center tabular-nums text-base text-neutral-500">{count}</td>

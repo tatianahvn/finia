@@ -100,7 +100,7 @@ module.exports = {
         // Ambar → Ocio / Warning
         ambar: {
           light:   '#FFFBEB',   // bg chip warning
-          DEFAULT: '#D97706',   // texto warning light
+          DEFAULT: '#B45309',   // texto warning light (oscurecido: contraste AA sobre light)
           dark:    '#FCD34D',   // texto warning dark
         },
 

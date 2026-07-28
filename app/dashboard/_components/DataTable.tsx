@@ -89,7 +89,7 @@ export default function DataTable({ transactions }: Props) {
                       {tx.comercio ?? tx.descripcion}
                     </td>
                     <td className="py-3 pr-4">
-                      <span className={`inline-flex items-center gap-1 text-base font-medium px-2.5 py-0.5 rounded-full ${meta.badgeClasses}`}>
+                      <span className={`inline-flex items-center gap-1 font-medium px-2.5 py-0.5 rounded-full ${meta.badgeClasses}`}>
                         <span aria-hidden>{meta.emoji}</span>
                         {meta.label}
                       </span>
