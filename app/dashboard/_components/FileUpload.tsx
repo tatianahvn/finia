@@ -144,7 +144,7 @@ export default function FileUpload({ onSaved }: Props) {
   }
 
   return (
-    <section className="bg-white rounded-2xl p-6 shadow-sm">
+    <section className="bg-white rounded-2xl p-6 shadow-sm flex flex-col h-full">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold text-neutral-900">Cargar archivo</h2>
         {process.env.NODE_ENV !== 'production' && (
@@ -159,60 +159,60 @@ export default function FileUpload({ onSaved }: Props) {
         )}
       </div>
 
-      <div className="grid grid-cols-3 gap-4 h-40">
-
-        {/* Columna izquierda — zona de carga */}
-        <div
-          onDragOver={e => { e.preventDefault(); setIsDragging(true) }}
-          onDragLeave={() => setIsDragging(false)}
-          onDrop={handleDrop}
-          onClick={() => inputRef.current?.click()}
-          className={`col-span-1 border-2 border-dashed rounded-xl flex flex-col items-center justify-center cursor-pointer transition-colors ${isDragging
-            ? 'border-violet-800 bg-violet-50'
-            : 'border-neutral-200 hover:border-violet-800 hover:bg-violet-50'
-            }`}
-        >
-          <input
-            ref={inputRef}
-            type="file"
-            accept=".pdf,application/pdf"
-            className="hidden"
-            onChange={handleChange}
-          />
-          <UploadCloud size={32} className="text-neutral-400 mb-3" />
-          <p className="text-sm font-medium text-neutral-900">Arrastra tu archivo aquí</p>
-          <p className="text-xs text-neutral-400 mt-1">
-            o <span className="text-violet-800 font-medium">selecciona</span> desde tu equipo
-          </p>
-          <p className="text-xs text-neutral-400 mt-3">Solo un PDF a la vez</p>
-        </div>
-
-        {/* Columna derecha — archivo seleccionado */}
-        <div className="col-span-2 flex flex-col gap-3 min-h-0">
-          <div className="flex-1 overflow-y-auto space-y-2 pr-1 min-h-0">
-            {!file ? (
-              <div className="h-full flex items-center justify-center">
-                <p className="text-sm text-neutral-400">Sin archivo cargado</p>
-              </div>
-            ) : (
-              <FileItem file={file} onRemove={removeFile} />
-            )}
-          </div>
-
-          {errorMsg && (
-            <p className="text-xs text-red-500 text-center">{errorMsg}</p>
-          )}
-
-          <button
-            onClick={handleConfirm}
-            disabled={!file || status === 'loading'}
-            className="w-full py-2.5 rounded-xl bg-violet-800 text-white text-sm font-semibold hover:bg-violet-900 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            {status === 'loading' ? 'Procesando...' : 'Confirmar carga'}
-          </button>
-        </div>
-
+      {/* Drop zone */}
+      <div
+        onDragOver={e => { e.preventDefault(); setIsDragging(true) }}
+        onDragLeave={() => setIsDragging(false)}
+        onDrop={handleDrop}
+        onClick={() => inputRef.current?.click()}
+        className={`flex-1 min-h-36 border-2 border-dashed rounded-xl flex flex-col items-center justify-center cursor-pointer transition-colors ${isDragging
+          ? 'border-violet-700 bg-violet-50'
+          : 'border-violet-200 hover:border-violet-700 hover:bg-violet-50'
+          }`}
+      >
+        <input
+          ref={inputRef}
+          type="file"
+          accept=".pdf,application/pdf"
+          className="hidden"
+          onChange={handleChange}
+        />
+        <UploadCloud size={36} className="text-violet-300 mb-3" />
+        <p className="text-base font-semibold text-neutral-900">Arrastra tu estado de cuenta aquí</p>
+        <p className="text-sm text-neutral-400 mt-1">
+          o <span className="text-violet-700 font-semibold">selecciona</span> desde tu equipo
+        </p>
+        <p className="text-sm text-neutral-400 mt-3">📄 Solo archivos PDF · Uno a la vez</p>
       </div>
+
+      {/* File selected */}
+      {file && (
+        <div className="mt-3">
+          <FileItem file={file} onRemove={removeFile} />
+        </div>
+      )}
+
+      {errorMsg && (
+        <p className="text-sm text-red-500 text-center mt-3">{errorMsg}</p>
+      )}
+
+      <button
+        onClick={handleConfirm}
+        disabled={!file || status === 'loading'}
+        className="w-full mt-3 py-3 rounded-xl bg-violet-700 text-white text-base font-bold
+          hover:bg-violet-800 transition-colors
+          disabled:opacity-40 disabled:cursor-not-allowed
+          flex items-center justify-center gap-2"
+      >
+        {status === 'loading' ? 'Procesando...' : '✨ Analizar estado de cuenta'}
+      </button>
+
+      <p className="mt-2 text-sm text-neutral-400 text-center flex items-center justify-center gap-1.5">
+        <span className="inline-flex items-center gap-1 bg-violet-50 text-violet-700 font-semibold text-xs px-2 py-0.5 rounded-full">
+          ⚡ 1 crédito
+        </span>
+        por análisis realizado
+      </p>
 
       <StatementReviewModal
         open={!!review}

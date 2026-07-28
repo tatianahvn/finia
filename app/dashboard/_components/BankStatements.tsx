@@ -148,7 +148,7 @@ export default function BankStatements({ reloadKey = 0 }: BankStatementsProps) {
   return (
     <section className="bg-white rounded-2xl p-6 shadow-sm flex flex-col flex-1 min-h-0">
       <div className="flex items-center justify-between mb-4 shrink-0">
-        <h2 className="text-lg font-semibold text-neutral-900">Administrar estados de cuenta</h2>
+        <h2 className="text-lg font-semibold text-neutral-900">Mis estados de cuenta</h2>
         <p className="text-xs text-neutral-400">{rows.length} estado{rows.length === 1 ? '' : 's'} de cuenta</p>
       </div>
 

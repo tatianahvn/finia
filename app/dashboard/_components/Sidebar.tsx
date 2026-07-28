@@ -12,12 +12,29 @@ import {
   UserCircle,
   Rocket,
   Zap,
+  UploadCloud,
+  FolderOpen,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 
-const navItems = [
+type NavItem = {
+  href: string
+  label: string
+  icon: React.ComponentType<{ size?: number }>
+  children?: { href: string; label: string; icon: React.ComponentType<{ size?: number }> }[]
+}
+
+const navItems: NavItem[] = [
   { href: '/dashboard', label: 'Resumen', icon: LayoutDashboard },
-  { href: '/dashboard/estados-de-cuenta', label: 'Estados de cuenta', icon: ScanText },
+  {
+    href: '/dashboard/estados-de-cuenta',
+    label: 'Estados de cuenta',
+    icon: ScanText,
+    children: [
+      { href: '/dashboard/estados-de-cuenta', label: 'Mis estados', icon: FolderOpen },
+      { href: '/dashboard/estados-de-cuenta/nuevo', label: 'Subir nuevo', icon: UploadCloud },
+    ],
+  },
   { href: '/dashboard/transacciones', label: 'Transacciones', icon: ArrowLeftRight },
   { href: '/dashboard/analisis', label: 'Análisis', icon: BarChart2 },
   { href: '/dashboard/consejos', label: 'Consejos', icon: Lightbulb },
@@ -55,21 +72,42 @@ export default function Sidebar() {
       </div>
 
       <nav className="flex-1 px-3 py-2 space-y-1">
-        {navItems.map(({ href, label, icon: Icon }) => {
+        {navItems.map(({ href, label, icon: Icon, children }) => {
           const isActive =
             href === '/dashboard' ? pathname === href : pathname.startsWith(href)
           return (
-            <Link
-              key={href}
-              href={href}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-base transition-colors ${isActive
-                ? 'bg-violet-100 text-violet-800 font-semibold'
-                : 'text-neutral-500 hover:bg-violet-50 hover:text-violet-800'
-                }`}
-            >
-              <Icon size={17} />
-              {label}
-            </Link>
+            <div key={href}>
+              <Link
+                href={href}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-base transition-colors ${isActive
+                  ? 'bg-violet-100 text-violet-800 font-semibold'
+                  : 'text-neutral-500 hover:bg-violet-50 hover:text-violet-800'
+                  }`}
+              >
+                <Icon size={17} />
+                {label}
+              </Link>
+              {children && isActive && (
+                <div className="ml-6 mt-1 space-y-0.5 border-l-2 border-violet-100 pl-3">
+                  {children.map(({ href: childHref, label: childLabel, icon: ChildIcon }) => {
+                    const isChildActive = pathname === childHref
+                    return (
+                      <Link
+                        key={childHref}
+                        href={childHref}
+                        className={`flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-sm transition-colors ${isChildActive
+                          ? 'text-violet-800 font-semibold bg-violet-50'
+                          : 'text-neutral-400 hover:text-violet-700 hover:bg-violet-50'
+                          }`}
+                      >
+                        <ChildIcon size={15} />
+                        {childLabel}
+                      </Link>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
           )
         })}
       </nav>

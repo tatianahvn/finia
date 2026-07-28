@@ -28,7 +28,7 @@ export default function EmptyAnalysisCTA({
       </div>
 
       <Link
-        href="/dashboard/estados-de-cuenta"
+        href="/dashboard/estados-de-cuenta/nuevo"
         className="flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-base text-white
           bg-gradient-to-r from-violet-600 to-fuchsia-500
           hover:from-violet-700 hover:to-fuchsia-600
