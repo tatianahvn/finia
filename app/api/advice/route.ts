@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
-import type { Consejo } from "@/lib/hooks/useAdviceHistory"
+import type { Consejo } from "@/lib/context/advice"
 
 interface SaveAdviceBody {
   statement_id?: string | null

@@ -28,7 +28,7 @@ export function AnalysisProvider({ children }: { children: ReactNode }) {
     }
 
     // Resumen + advertencias del estado de cuenta más reciente.
-    // TODO: Hace falta cachar el error, solamente identifica si no hay registros, no si falla.
+    // TODO: Hace falta cachar el error al realizar la consulta en la bd, solamente identifica si no hay registros, no si falla.
     const { data: latest } = await supabase
       .from('statements')
       .select('resumen, advertencias')

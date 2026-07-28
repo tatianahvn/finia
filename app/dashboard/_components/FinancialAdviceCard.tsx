@@ -1,11 +1,15 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { ChartNoAxesCombined, Sparkles, ArrowRight, X, Loader2, AlertTriangle } from 'lucide-react'
 import type { Transaction } from '@/types/statements'
-import type { AdviceEntry } from '@/lib/hooks/useAdviceHistory'
+import { useAdviceHistory, type AdviceEntry } from '@/lib/context/advice'
 import { hasExpenses } from '@/lib/services/advice'
-import { useMonthlyAdvice, type MonthlyAdviceStatus } from '@/lib/hooks/useMonthlyAdvice'
+
+// Estado de visualización del consejo del mes, derivado del historial en Context.
+// 'idle' sin gastos/mes · 'loading' historial cargando · 'ready' hay consejo ·
+// 'empty' cargado pero sin consejo para el mes.
+type AdviceStatus = 'idle' | 'loading' | 'ready' | 'empty' | 'error'
 
 function monthLabel(ym: string) {
   if (!ym) return ''
@@ -22,8 +26,18 @@ interface Props {
 export default function FinancialAdviceCard({ transactions, month }: Props) {
   const [open, setOpen] = useState(false)
 
+  const { entries, loaded } = useAdviceHistory()
   const hasGastos = hasExpenses(transactions)
-  const { entry, status } = useMonthlyAdvice(month, hasGastos)
+
+  // El consejo del mes sale del historial ya cargado en Context; sin fetch propio.
+  const entry = useMemo(
+    () => entries.find(e => e.mes === month) ?? null,
+    [entries, month],
+  )
+  const status: AdviceStatus =
+    !hasGastos || !month ? 'idle'
+      : !loaded ? 'loading'
+        : entry ? 'ready' : 'empty'
 
   const loading = status === 'loading'
   const previewConsejos = entry?.consejos?.slice(0, 4) ?? []
@@ -104,7 +118,7 @@ interface ModalProps {
   onClose: () => void
   month: string
   entry: AdviceEntry | null
-  status: MonthlyAdviceStatus
+  status: AdviceStatus
 }
 
 function AdviceModal({ open, onClose, month, entry, status }: ModalProps) {
@@ -189,7 +203,7 @@ function Advice({ entry }: { entry: AdviceEntry }) {
 
 // Estado de error: la BD no devolvió consejos para el mes ('empty', típicamente
 // porque la generación falló al guardar) o la consulta falló ('error').
-function ErrorState({ status, month }: { status: MonthlyAdviceStatus; month: string }) {
+function ErrorState({ status, month }: { status: AdviceStatus; month: string }) {
   const message =
     status === 'empty'
       ? `No encontramos consejos para ${monthLabel(month)}. Es posible que ocurriera un error al generarlos. Vuelve a cargar el estado de cuenta de este periodo para generarlos nuevamente.`

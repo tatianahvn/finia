@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { ChevronDown, Sparkles, ScanText } from 'lucide-react'
-import { useAdviceHistory, type AdviceEntry } from '@/lib/hooks/useAdviceHistory'
+import { useAdviceHistory, type AdviceEntry } from '@/lib/context/advice'
 
 function monthLabel(ym: string) {
   const [year, month] = ym.split('-')
@@ -82,7 +82,7 @@ export default function ConsejosPage() {
         <div>
           <h1 className="text-3xl font-bold text-neutral-900">Consejos financieros</h1>
           <p className="text-md text-neutral-500 mt-1">
-            Recomendaciones personalizadas generadas a partir de tus gastos.
+            Aquí encontrarás todas las recomendaciones personalizadas generadas a partir de tus gastos mensuales.
           </p>
         </div>
         <div className="flex flex-col items-center justify-center gap-4 rounded-2xl bg-white p-16 shadow-sm text-center">
@@ -97,7 +97,7 @@ export default function ConsejosPage() {
             </p>
           </div>
           <Link
-            href="/dashboard/estados-de-cuenta"
+            href="/dashboard/estados-de-cuenta/nuevo"
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm text-white
               bg-gradient-to-r from-violet-600 to-fuchsia-500
               hover:from-violet-700 hover:to-fuchsia-600

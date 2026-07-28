@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react'
 import { ChevronLeft, ChevronRight, Download, Loader2, TrendingUp, TrendingDown, Scale, Hash } from 'lucide-react'
 import { useAnalysis } from '@/lib/context/analysis'
-import { useAdviceHistory } from '@/lib/hooks/useAdviceHistory'
+import { useAdviceHistory } from '@/lib/context/advice'
 import SpendingByCategory from '../_components/SpendingByCategory'
 import SpendingByConcept from '../_components/SpendingByConcept'
 import FinancialAdviceCard from '../_components/FinancialAdviceCard'

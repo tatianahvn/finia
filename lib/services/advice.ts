@@ -1,7 +1,7 @@
 'use client'
 
 import type { Transaction } from '@/types/statements'
-import type { AdviceEntry } from '@/lib/hooks/useAdviceHistory'
+import type { AdviceEntry } from '@/lib/context/advice'
 
 const CARGO_TYPES = new Set(['cargo', 'transferencia_enviada', 'retiro', 'comision'])
 

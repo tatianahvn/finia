@@ -3,7 +3,7 @@
 import { Document, Page, View, Text, StyleSheet, Font } from '@react-pdf/renderer'
 import type { Transaction } from '@/types/statements'
 import { getCategoryMeta } from '@/lib/categories'
-import type { AdviceEntry } from '@/lib/hooks/useAdviceHistory'
+import type { AdviceEntry } from '@/lib/context/advice'
 
 // Twemoji para que los íconos de los consejos no salgan como cuadros
 Font.registerEmojiSource({
